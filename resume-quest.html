@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sai Eshwar · Resume Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1b1033; --paper:#f5efe1; --accent:#ffcb3c; --accent2:#56c2ff;
+    --green:#5fd068; --pink:#ff7eb6; --panel:#241640; --panel2:#160c2b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:#0e0820;
+    color:var(--paper);
+    font-family:'Press Start 2P', monospace;
+    display:flex; align-items:center; justify-content:center;
+    min-height:100vh; overflow:hidden;
+    -webkit-font-smoothing:none;
+  }
+  #wrap{position:relative; width:832px; max-width:100vw;}
+  #stage{
+    position:relative; width:832px; height:576px; max-width:100vw;
+    background:#160c2b; border:4px solid var(--ink);
+    box-shadow:0 0 0 4px var(--accent), 0 14px 40px rgba(0,0,0,.6);
+    image-rendering:pixelated; overflow:hidden;
+  }
+  canvas{display:block; image-rendering:pixelated; width:100%; height:100%;}
+
+  /* HUD */
+  #hud{position:absolute; top:0; left:0; right:0; display:flex; justify-content:space-between;
+    padding:10px 12px; font-size:10px; pointer-events:none; text-shadow:2px 2px 0 #000;}
+  #hud .tag{background:rgba(22,12,43,.82); padding:6px 8px; border:2px solid var(--accent);}
+  #zone{color:var(--accent)}
+  #prog{color:var(--green)}
+  #chase{color:#ff5470; border-color:#ff5470!important}
+
+  /* stamina bar */
+  #stambox{position:absolute; left:12px; bottom:12px; display:flex; align-items:center; gap:8px;
+    font-size:8px; color:var(--paper); text-shadow:2px 2px 0 #000; pointer-events:none; z-index:3;}
+  .stamlabel{opacity:.85}
+  #stambar{width:130px; height:11px; background:rgba(12,7,32,.85); border:2px solid var(--ink); padding:1px;}
+  #stamfill{height:100%; width:100%; background:#5fd068; transition:width .08s linear, background .2s}
+
+  /* prompt */
+  #prompt{position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+    background:var(--accent); color:var(--ink); padding:8px 12px; font-size:10px;
+    border:3px solid var(--ink); display:none; text-shadow:none;
+    animation:bob .8s infinite alternate;}
+  @keyframes bob{from{transform:translateX(-50%) translateY(0)}to{transform:translateX(-50%) translateY(-4px)}}
+
+  /* toast (door unlocked) */
+  #toast{position:absolute; top:56px; left:50%; transform:translateX(-50%);
+    background:var(--green); color:var(--ink); padding:8px 12px; font-size:9px;
+    border:3px solid var(--ink); display:none; text-shadow:none; z-index:4;
+    box-shadow:4px 4px 0 rgba(0,0,0,.4);}
+
+  /* dialog */
+  #dialog{position:absolute; inset:0; background:rgba(8,4,18,.72); display:none;
+    align-items:center; justify-content:center; padding:18px;}
+  #card{width:100%; max-width:680px; max-height:92%; overflow:auto;
+    background:var(--panel); border:4px solid var(--accent);
+    box-shadow:0 0 0 4px var(--ink), 8px 8px 0 rgba(0,0,0,.5);}
+  #card .bar{background:var(--accent); color:var(--ink); padding:10px 14px; font-size:12px;
+    display:flex; justify-content:space-between; align-items:center; gap:10px;}
+  #card .bar .sub{font-size:8px; opacity:.8}
+  #card .body{padding:16px 18px; font-size:11px; line-height:1.9; font-family:'Press Start 2P',monospace;}
+  #card .body .role{color:var(--accent2); font-size:11px; margin-bottom:6px}
+  #card .body .meta{color:var(--pink); font-size:8px; margin-bottom:12px}
+  #card .body ul{list-style:none; padding:0}
+  #card .body li{position:relative; padding-left:18px; margin-bottom:12px; font-size:9px; line-height:1.95}
+  #card .body li::before{content:'>'; position:absolute; left:0; color:var(--green)}
+  #card .body .plain{font-size:9px; line-height:1.95; margin-bottom:10px}
+  #card .body a{color:var(--accent)}
+  #card .foot{padding:10px 14px 16px; text-align:center}
+  #card .foot button{font-family:'Press Start 2P',monospace; font-size:10px; cursor:pointer;
+    background:var(--green); color:var(--ink); border:3px solid var(--ink); padding:9px 16px;}
+  #card .foot button:hover{background:#7be084}
+  .seen{color:var(--green)!important}
+
+  /* start screen */
+  #start{position:absolute; inset:0; background:linear-gradient(160deg,#1a0f38,#0e0820);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; text-align:center; padding:24px;}
+  #start h1{font-size:22px; color:var(--accent); text-shadow:3px 3px 0 var(--ink); line-height:1.4}
+  #start h2{font-size:10px; color:var(--accent2)}
+  #start .keys{font-size:9px; line-height:2.2; color:var(--paper); background:rgba(22,12,43,.7); padding:14px 18px; border:2px solid var(--ink)}
+  #start .keys b{color:var(--accent)}
+  #start button{font-family:'Press Start 2P',monospace; font-size:13px; cursor:pointer;
+    background:var(--accent); color:var(--ink); border:4px solid var(--ink); padding:14px 22px;
+    box-shadow:5px 5px 0 rgba(0,0,0,.5);}
+  #start button:hover{background:#ffd863}
+  #start .blink{font-size:8px; color:var(--green); animation:bl 1s steps(2) infinite}
+  @keyframes bl{50%{opacity:0}}
+
+  /* win toast */
+  #win{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    background:var(--green); color:var(--ink); border:4px solid var(--ink); padding:18px 22px;
+    font-size:11px; line-height:1.8; text-align:center; display:none; box-shadow:6px 6px 0 rgba(0,0,0,.5); z-index:5;}
+
+  /* mobile dpad */
+  #pad{position:absolute; bottom:10px; right:10px; display:none; z-index:6;}
+  #pad .row{display:flex; justify-content:center}
+  #pad button{width:46px; height:46px; margin:2px; font-family:'Press Start 2P',monospace; font-size:12px;
+    background:rgba(255,203,60,.9); color:var(--ink); border:3px solid var(--ink); touch-action:none;}
+  #act{position:absolute; bottom:14px; left:10px; width:60px; height:60px; display:none; z-index:6;
+    border-radius:50%; font-family:'Press Start 2P',monospace; font-size:10px;
+    background:var(--green); color:var(--ink); border:3px solid var(--ink);}
+  #sprintBtn{position:absolute; bottom:80px; left:14px; width:52px; height:40px; display:none; z-index:6;
+    font-family:'Press Start 2P',monospace; font-size:8px;
+    background:var(--accent2); color:var(--ink); border:3px solid var(--ink);}
+  @media (hover:none) and (pointer:coarse){#pad,#act,#sprintBtn{display:block}}
+  .small{font-size:7px;opacity:.7;margin-top:8px}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;top:10px;left:12px;z-index:60;font-family:'Press Start 2P',monospace;font-size:8px;color:#0e0820;background:#ffcb3c;border:3px solid #1b1033;padding:8px 10px;text-decoration:none;box-shadow:3px 3px 0 rgba(0,0,0,.5)">◀ PORTFOLIO</a>
+<div id="wrap">
+<div id="stage">
+  <canvas id="game" width="832" height="576"></canvas>
+
+  <div id="hud">
+    <div class="tag" id="zone">LOBBY</div>
+    <div class="tag" id="chase">SKEPTIC: WAKING…</div>
+    <div class="tag" id="prog">EXPLORED 0/19</div>
+  </div>
+  <div id="stambox"><span class="stamlabel">SPRINT</span><div id="stambar"><div id="stamfill"></div></div></div>
+
+  <div id="prompt">▲ Press E to interact</div>
+  <div id="toast"></div>
+
+  <!-- mobile controls -->
+  <div id="pad">
+    <div class="row"><button data-k="up">▲</button></div>
+    <div class="row"><button data-k="left">◀</button><button data-k="down">▼</button><button data-k="right">▶</button></div>
+  </div>
+  <button id="act">E</button>
+  <button id="sprintBtn">DASH</button>
+
+  <div id="win">★ THE SKEPTIC IS CONVINCED ★<br><br>You showed all 19 proofs.<br>Now hire Sai. :)<br><br><span style="font-size:8px">Press E to close</span></div>
+
+  <div id="dialog">
+    <div id="card">
+      <div class="bar"><span id="cardTitle"></span><span class="sub" id="cardSub"></span></div>
+      <div class="body" id="cardBody"></div>
+      <div class="foot"><button id="closeBtn">CLOSE [E]</button></div>
+    </div>
+  </div>
+
+  <div id="start">
+    <h2>▶ CURIOUS BUILDER · PROBLEM FINDER ◀</h2>
+    <h1>SAI ESHWAR'S<br>RESUME QUEST</h1>
+    <div class="keys">
+      <b>WASD</b> / <b>ARROWS</b> move &nbsp; <b>SHIFT</b> sprint<br>
+      <b>E</b> / <b>SPACE</b> read a station<br>
+      <b style="color:#ff5470">The Skeptic</b> chases you. Reading a<br>
+      station shows proof and stuns them.<br>
+      Read all <b id="startCount">19</b> stations to convince them.
+    </div>
+    <button id="startBtn">PRESS START</button>
+    <div class="blink">▶ insert curiosity to continue ◀</div>
+    <div class="small">Best on desktop. Touch controls appear on mobile.</div>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const TILE=32, COLS=36, ROWS=24;
+const VIEW_W=832, VIEW_H=576;
+const cv=document.getElementById('game'), ctx=cv.getContext('2d');
+ctx.imageSmoothingEnabled=false;
+
+/* ---------- MAP ----------
+   # wall, . floor, plus colored zone tiles via zone map.
+*/
+let map=[];
+for(let y=0;y<ROWS;y++){
+  let row=[];
+  for(let x=0;x<COLS;x++){
+    if(x===0||y===0||x===COLS-1||y===ROWS-1) row.push('#');
+    else row.push('.');
+  }
+  map.push(row);
+}
+// a few interior partition walls (with gaps as doorways) to give "rooms" feel
+function wallSeg(x1,y1,x2,y2,gaps){
+  gaps=gaps||[];
+  if(y1===y2){for(let x=x1;x<=x2;x++){ if(!gaps.includes(x)) map[y1][x]='#';}}
+  else{for(let y=y1;y<=y2;y++){ if(!gaps.includes(y)) map[y][x1]='#';}}
+}
+// Rooms are fully enclosed; the ONLY connections are door tiles (left as floor here).
+// Top band split into Lobby | Experience | Education by vertical walls (door gaps).
+wallSeg(12,1,12,6,[4]);   // Lobby -> Experience  (door at 12,4)
+wallSeg(25,1,25,6,[4]);   // Experience -> Education (door at 25,4)
+// Horizontal divider below top band; only Education connects down (door at 30,7).
+wallSeg(1,7,34,7,[30]);
+// Vertical divider between Projects Lab (left) and Pubs/Certs/Skills (right); door at 15,12.
+wallSeg(15,8,15,16,[12]);
+// Horizontal divider above Volunteering; only Projects connects down (door at 8,17).
+wallSeg(1,17,34,17,[8]);
+
+/* zones: colored floor regions [x1,y1,x2,y2,color,label,labelX,labelY] */
+const zones=[
+  [1,1,11,6,'#2c1d52','LOBBY',2,1.2],
+  [12,1,24,6,'#1f3b2e','EXPERIENCE',12.4,1.2],
+  [25,1,34,6,'#3a2240','EDUCATION',25.4,1.2],
+  [1,8,14,16,'#1d2b4a','PROJECTS LAB',1.6,8.2],
+  [16,8,34,16,'#42261c','PUBLICATIONS / CERTS / SKILLS',16.4,8.2],
+  [1,18,34,22,'#3b1d33','VOLUNTEERING & LEADERSHIP',1.6,18.2],
+];
+function zoneAt(tx,ty){for(const z of zones){if(tx>=z[0]&&tx<=z[2]&&ty>=z[1]&&ty<=z[3])return z;}return null;}
+
+/* ---------- STATIONS (NPCs / objects) ---------- */
+// type: 'npc' or 'obj'; each occupies its tile (solid). Interact when adjacent.
+const stations=[
+  {x:3,y:3,c:'#ffcb3c',k:'NPC',label:'Receptionist',type:'npc',
+   title:'WELCOME, SAI ESHWAR',sub:'Curious builder · problem finder',
+   html:`<div class="plain">Hi, I'm <b>Sai Eshwar</b>, a curious builder who finds real user problems and builds products that solve them. AWS Certified AI Practitioner &amp; published researcher.</div>
+   <div class="meta">CONTACT</div>
+   <ul>
+   <li>India • +91 73387 79995</li>
+   <li><a href="mailto:seshwarsai@gmail.com">seshwarsai@gmail.com</a></li>
+   <li><a href="https://linkedin.com/in/sai-eshwar-s-b529931bb" target="_blank">linkedin.com/in/sai-eshwar-s</a></li>
+   </ul>
+   <div class="plain">Walk with WASD, sprint with Shift. Read a station to show proof and stun the Skeptic chasing you.</div>`},
+
+  {x:8,y:3,c:'#56c2ff',k:'AB',type:'obj',label:'About Me',
+   title:'ABOUT ME',sub:'find real problems · build the fix',
+   html:`<div class="plain">I'm the kind of person who can't leave a problem alone. When someone's fighting a clunky process or quietly working around something broken, I want to understand exactly why it hurts, then build something that makes the pain disappear.</div>
+   <div class="plain">That curiosity pulls me toward building products: sitting with people, asking the slightly annoying follow up questions, and digging until the real problem surfaces. Then I turn that insight into something real: an automation, a dashboard, a working prototype I can ship the same week.</div>
+   <div class="plain">Tenacity is the other half. I'd rather ship a rough first version, watch how people actually use it, and improve, rather than wait for a perfect plan.</div>
+   <div class="meta">FOCUS</div>
+   <ul><li>Product · AI · Data</li></ul>`},
+
+  {x:14,y:3,c:'#5fd068',k:'EV',type:'npc',label:'Everstage',
+   title:'EVERSTAGE TECHNOLOGIES',sub:'06/2024 to Present',
+   html:`<div class="role">Senior Solution &amp; Customer Experience Specialist</div>
+   <div class="meta">Chennai, India</div>
+   <ul>
+   <li>Own end to end implementation of sales compensation projects for enterprise clients with 500K+ ARR, configuring systems that impact 1,000+ payees per org; primary liaison for international stakeholders.</li>
+   <li>Mine &amp; transform large CRM datasets (Salesforce, HubSpot, Stripe) with SQL &amp; Python to find compensation logic gaps and inform product decisions.</li>
+   <li>Build multi view Apache Superset dashboards tracking MRR, CAC, TCV and quota attainment for real time leadership decisions.</li>
+   <li>Bridge product, engineering &amp; customer success to define requirements and ship automated metric solutions that cut manual overhead.</li>
+   </ul>`},
+
+  {x:20,y:3,c:'#56c2ff',k:'UC',type:'npc',label:'Researcher',
+   title:'UNIVERSITY OF CYPRUS',sub:'06/2023 to 08/2023',
+   html:`<div class="role">Research Intern (Onsite), Nicosia, Cyprus</div>
+   <ul>
+   <li>Contributed to research on federated learning &amp; distributed ML for dynamic transmission mode selection in cell free D2D communication systems.</li>
+   <li>Simulated a decentralised wireless network in NS3; implemented clustering algorithms (K Means, OPTICS, Spectral, Ward) for node grouping &amp; optimisation.</li>
+   <li>Trained a synthetic data neural network in Python to pick transmission modes by energy efficiency, distance &amp; signal quality, with live topology in NetAnim.</li>
+   </ul>`},
+
+  {x:29,y:3,c:'#ff7eb6',k:'ED',type:'obj',label:'Degree',
+   title:'SSN COLLEGE OF ENGINEERING',sub:'11/2020 to 05/2024',
+   html:`<div class="role">B.E. Electronics &amp; Communication Engineering</div>
+   <div class="meta">CGPA 8.915 / 10 · First Class with Distinction</div>
+   <div class="plain"><b>Relevant coursework:</b> Data Structures, Python, Computer Networks, Machine Learning, Computer Vision, Communication Network Security, Control Systems, VLSI Design, Information Theory &amp; Coding, Professional Ethics &amp; Management.</div>`},
+
+  {x:32,y:3,c:'#ff7eb6',k:'12',type:'obj',label:'School',
+   title:'PSBB SENIOR SECONDARY',sub:'04/2019 to 04/2020',
+   html:`<div class="role">Class 12, CBSE, Chennai</div>
+   <div class="meta">Percentage: 95.2%</div>
+   <div class="plain">Padma Seshadri Bala Bhavan Senior Secondary School.</div>`},
+
+  // Projects lab (7 modules)
+  {x:3,y:10,c:'#ffcb3c',k:'N8',type:'obj',label:'N8N Bot',
+   title:'N8N: FATHOM × FRESHDESK',sub:'2025 • Automation',
+   html:`<ul>
+   <li>Built an end to end N8N pipeline that triggers on Fathom call completion, extracts the AI meeting summary + recording link, and posts them into the matching Freshdesk ticket.</li>
+   <li>Eliminated manual post call documentation; every customer interaction is auto logged with full context.</li>
+   <li>Used webhook triggers, REST API integrations (Fathom + Freshdesk) and conditional routing for reliable, edge case aware data flow.</li>
+   </ul>
+   <div class="meta">STACK</div><div class="plain">N8N · Fathom API · Freshdesk API · Webhooks</div>`},
+
+  {x:7,y:10,c:'#56c2ff',k:'AI',type:'obj',label:'Voice Agent',
+   title:'AI VOICE AGENT · L1 SUPPORT',sub:'2025 • ElevenLabs × N8N',
+   html:`<ul>
+   <li>Designed &amp; deployed an AI voice agent (ElevenLabs + N8N) that autonomously handles Tier 1 customer queries with no human in the loop.</li>
+   <li>Built a structured knowledge base from scratch with a RAG pipeline grounding responses in accurate product info.</li>
+   <li>Cut inbound call volume for support agents, freeing them for complex, high value interactions.</li>
+   </ul>
+   <div class="meta">STACK</div><div class="plain">ElevenLabs · N8N · RAG · Knowledge Base</div>`},
+
+  {x:11,y:10,c:'#5fd068',k:'AS',type:'obj',label:'ASCON Rig',
+   title:'IoV SECURITY · ASCON',sub:'2023/24 • Cryptography',
+   html:`<ul>
+   <li>Deployed the ASCON lightweight cipher on Raspberry Pi over MQTT to simulate real time IoT encryption/decryption.</li>
+   <li>Simulated DoS, MITM &amp; password cracking attacks with Snort + Kali Linux; hit 99.95% DoS detection accuracy via an ensemble ML voting classifier on CICIDS2017.</li>
+   <li>Validated ASCON (NPCR 99.42%) with faster execution &amp; lower CPU than PRESENT; contributed to a peer reviewed Springer Nature publication.</li>
+   </ul>
+   <div class="meta">STACK</div><div class="plain">ASCON · Raspberry Pi · MQTT · Snort · CICIDS2017</div>`},
+
+  {x:3,y:13,c:'#ff7eb6',k:'CY',type:'obj',label:'Crop AI',
+   title:'CROP YIELD PREDICTOR',sub:'2023 • Machine Learning',
+   html:`<ul>
+   <li>Collected &amp; analysed Kaggle agricultural data (soil type, moisture, pH, crop history); trained &amp; validated a Random Forest at 98% accuracy.</li>
+   <li>Enabled data driven crop selection for farmers: a full product loop from raw data to actionable, user facing insight.</li>
+   </ul>
+   <div class="meta">STACK</div><div class="plain">Python · Random Forest · Kaggle · Data Analysis</div>`},
+
+  {x:7,y:13,c:'#ffcb3c',k:'CH',type:'obj',label:'ChurnSense',
+   title:'CHURNSENSE',sub:'2025 • AI Product',
+   html:`<ul>
+   <li>A customer churn intelligence tool that ingests product usage and account data to flag at risk customers before they leave.</li>
+   <li>Surfaces health scores and the signals driving each risk, so customer success teams can act early.</li>
+   </ul>
+   <div class="meta">STACK</div><div class="plain">Churn Prediction · Customer Analytics · AI · Health Scores</div>`},
+
+  {x:11,y:13,c:'#56c2ff',k:'RR',type:'obj',label:'RivalRadar',
+   title:'RIVALRADAR',sub:'2025 • Competitive Intel',
+   html:`<ul>
+   <li>A competitor intelligence platform for YouTube creators that turns "who is my competition really?" into structured, normalized engagement signals.</li>
+   <li>Maps discoverable channels and compares them on like for like engagement metrics.</li>
+   </ul>
+   <div class="meta">STACK</div><div class="plain">YouTube · Competitor Intel · Engagement Signals · AI</div>`},
+
+  {x:7,y:16,c:'#5fd068',k:'TN',type:'obj',label:'TN Election',
+   title:'DECODING THE 2026 TN ELECTION',sub:'2026 • Data Storytelling',
+   html:`<ul>
+   <li>A data analytics teardown of the 2026 Tamil Nadu Assembly election (Codebasics Resume Project Challenge), framed as a fact based brief for a fictional news network.</li>
+   <li>Cleaned &amp; analysed candidate level results across all 234 constituencies for 2021 &amp; 2026: 8,000+ rows from the Election Commission of India.</li>
+   <li>Surfaced the story: 163/234 seats (69.7%) flipped party; a new entrant took 35.1% of the statewide vote. Shipped 7 charts + an 11 slide stakeholder deck.</li>
+   </ul>
+   <div class="meta">STACK</div><div class="plain">Python · Pandas · Plotly · PowerPoint · Data Storytelling</div>`},
+
+  // Right room
+  {x:20,y:11,c:'#ffcb3c',k:'PB',type:'obj',label:'Publication',
+   title:'PUBLICATION · SPRINGER NATURE',sub:'2025 • Open Access',
+   html:`<div class="role">Improving Security in 5G Vehicular Networks Using ASCON &amp; ML based NIDS</div>
+   <div class="meta">Discover Internet of Things, Springer Nature</div>
+   <div class="plain">DOI: 10.1007/s43926-025-00226-1</div>
+   <ul><li><a href="https://doi.org/10.1007/s43926-025-00226-1" target="_blank">Read the publication ↗</a></li></ul>`},
+
+  {x:26,y:11,c:'#56c2ff',k:'AW',type:'obj',label:'Certs Shelf',
+   title:'CERTIFICATIONS',sub:'2026',
+   html:`<ul>
+   <li>AWS Certified AI Practitioner, AWS · <a href="https://www.credly.com/badges/a8e058bc-98f3-436e-8871-6b1605e75144/public_url" target="_blank">Credly ↗</a></li>
+   <li>AWS Certified Cloud Practitioner, AWS · <a href="https://www.credly.com/badges/c7dfbae0-b392-4c11-82e8-4fca44d26d8f/public_url" target="_blank">Credly ↗</a></li>
+   <li>Tech for PM, HelloPM · <a href="https://hellopm.co/certificate/?certificate_id=SJHMZV" target="_blank">Certificate ↗</a></li>
+   </ul>`},
+
+  {x:32,y:11,c:'#5fd068',k:'>_',type:'obj',label:'Skills Terminal',
+   title:'TECHNICAL SKILLS',sub:'~/skills',
+   html:`<ul>
+   <li><b>Languages &amp; Data:</b> SQL, Python</li>
+   <li><b>Tools &amp; Platforms:</b> Apache Superset, N8N, Fathom, Freshdesk, Salesforce, HubSpot, Stripe, Supabase, Lovable</li>
+   <li><b>Cloud &amp; Infra:</b> AWS, Raspberry Pi, MQTT, NS3</li>
+   <li><b>PM &amp; Collab:</b> Stakeholder Mgmt, Agile, Cross functional Execution, Requirements Definition, KPI Reporting, Market Research</li>
+   </ul>`},
+
+  // Volunteering band
+  {x:12,y:20,c:'#ff7eb6',k:'NS',type:'npc',label:'NSS Lead',
+   title:'NATIONAL SERVICE SCHEME',sub:'Volunteering',
+   html:`<ul>
+   <li>Headed a campus wide health &amp; hygiene awareness campaign impacting 200+ students and local residents.</li>
+   <li>Coordinated student volunteers for a large scale beach cleaning drive.</li>
+   </ul>`},
+
+  {x:20,y:20,c:'#ffcb3c',k:'IV',type:'npc',label:'Event Lead',
+   title:'INVENTE 6.0 · JUNKYARD JUMBLE',sub:'Event Supervisor',
+   html:`<ul>
+   <li>Led a team of ten to run a flagship technical event for 150+ participants.</li>
+   <li>Owned event flow, team coordination &amp; post event evaluation.</li>
+   </ul>`},
+
+  {x:28,y:20,c:'#56c2ff',k:'IN',type:'npc',label:'Organiser',
+   title:'INSTINCTS 2023',sub:'Organising Committee',
+   html:`<ul>
+   <li>Managed logistics &amp; cross departmental coordination for SSN University's annual cultural fest.</li>
+   <li>Contributed to theme development &amp; operations across high footfall domains.</li>
+   </ul>`},
+];
+const TOTAL=stations.length;
+const solid=new Set();
+stations.forEach(s=>solid.add(s.x+','+s.y));
+// tag each station with its room (zone index)
+stations.forEach(s=>{ s.room=zones.indexOf(zoneAt(s.x,s.y)); });
+
+/* ---------- DOORS (open passages between rooms; no longer locked) ---------- */
+const doors=[
+  {x:12,y:4, o:'v', open:true},
+  {x:25,y:4, o:'v', open:true},
+  {x:30,y:7, o:'h', open:true},
+  {x:15,y:12,o:'v', open:true},
+  {x:8, y:17,o:'h', open:true},
+];
+const doorMap=new Map(); doors.forEach(d=>doorMap.set(d.x+','+d.y,d));
+
+function tileSolid(tx,ty){
+  if(tx<0||ty<0||tx>=COLS||ty>=ROWS) return true;
+  const dr=doorMap.get(tx+','+ty);
+  if(dr) return !dr.open;            // closed door blocks; open door is passable
+  if(map[ty][tx]==='#') return true;
+  if(solid.has(tx+','+ty)) return true;
+  return false;
+}
+
+/* ---------- PLAYER ---------- */
+const player={x:3*TILE+6, y:5*TILE+4, w:20, h:24, spd:2.4, dir:'down', frame:0, moving:false, stun:0, stam:100};
+function rectSolid(px,py,pw,ph){
+  const x1=Math.floor(px/TILE), x2=Math.floor((px+pw-1)/TILE);
+  const y1=Math.floor(py/TILE), y2=Math.floor((py+ph-1)/TILE);
+  for(let ty=y1;ty<=y2;ty++)for(let tx=x1;tx<=x2;tx++){if(tileSolid(tx,ty))return true;}
+  return false;
+}
+function tileCenterFree(tx,ty){return !tileSolid(tx,ty);}
+
+/* ---------- THE SKEPTIC (chaser) ----------
+   A doubtful recruiter who hunts you. Reading a station = "proof" that
+   stuns their skepticism for a while. Read everything and they're convinced. */
+const chaser={x:32*TILE+5, y:20*TILE+5, w:22, h:22, baseSpd:1.95, dir:[0,0],
+              grace:170, stun:0, repath:0, state:'idle', frame:0};
+let caught=0, flash=0, complete=false;
+
+// Breadth-first search: first step direction from (sx,sy) toward (tx,ty)
+function bfsDir(sx,sy,tx,ty){
+  if(sx===tx&&sy===ty) return [0,0];
+  const prev=new Map(); prev.set(sx+','+sy,null);
+  const q=[[sx,sy]]; const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+  let found=false;
+  while(q.length){
+    const [cx,cy]=q.shift();
+    if(cx===tx&&cy===ty){found=true;break;}
+    for(const [dx,dy] of dirs){
+      const nx=cx+dx,ny=cy+dy,key=nx+','+ny;
+      if(prev.has(key))continue;
+      if(tileSolid(nx,ny))continue;
+      prev.set(key,[cx,cy]); q.push([nx,ny]);
+    }
+  }
+  if(!found) return null;
+  let cur=[tx,ty];
+  while(true){
+    const p=prev.get(cur[0]+','+cur[1]);
+    if(!p) return null;
+    if(p[0]===sx&&p[1]===sy) return [cur[0]-sx, cur[1]-sy];
+    cur=p;
+  }
+}
+function overlap(a,b){
+  return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+}
+function updateChaser(){
+  if(complete){ chaser.state='convinced'; return; }
+  if(chaser.grace>0){ chaser.grace--; chaser.state='idle'; return; }
+  if(chaser.stun>0){ chaser.stun--; chaser.state='stunned'; return; }
+  chaser.state='hunting'; chaser.frame+=0.2;
+  const ct=[Math.floor((chaser.x+chaser.w/2)/TILE), Math.floor((chaser.y+chaser.h/2)/TILE)];
+  const pt=[Math.floor((player.x+player.w/2)/TILE), Math.floor((player.y+player.h/2)/TILE)];
+  if(chaser.repath<=0){ chaser.dir=bfsDir(ct[0],ct[1],pt[0],pt[1])||[0,0]; chaser.repath=8; }
+  else chaser.repath--;
+  let mvx=0,mvy=0; const d=chaser.dir;
+  if(d&&(d[0]||d[1])){ mvx=d[0]; mvy=d[1]; }
+  else { const ddx=player.x-chaser.x, ddy=player.y-chaser.y, L=Math.hypot(ddx,ddy)||1; mvx=ddx/L; mvy=ddy/L; }
+  const spd=chaser.baseSpd;
+  // keep centered on the cross-axis so it threads doorways cleanly
+  if(d&&d[0]!==0){ const ty=ct[1]*TILE+(TILE-chaser.h)/2; const dy=ty-chaser.y; chaser.y+=Math.sign(dy)*Math.min(spd,Math.abs(dy)); }
+  else if(d&&d[1]!==0){ const tx=ct[0]*TILE+(TILE-chaser.w)/2; const dx=tx-chaser.x; chaser.x+=Math.sign(dx)*Math.min(spd,Math.abs(dx)); }
+  let nxp=chaser.x+mvx*spd; if(!rectSolid(nxp,chaser.y,chaser.w,chaser.h)) chaser.x=nxp;
+  let nyp=chaser.y+mvy*spd; if(!rectSolid(chaser.x,nyp,chaser.w,chaser.h)) chaser.y=nyp;
+  if(overlap(player,chaser)) onCaught();
+}
+function onCaught(){
+  const ang=Math.atan2((player.y+player.h/2)-(chaser.y+chaser.h/2),(player.x+player.w/2)-(chaser.x+chaser.w/2));
+  // knock the player back in small safe steps
+  for(let s=0;s<TILE*1.6;s+=4){
+    const tx=player.x+Math.cos(ang)*4, ty=player.y+Math.sin(ang)*4;
+    if(rectSolid(tx,ty,player.w,player.h)) break;
+    player.x=tx; player.y=ty;
+  }
+  player.stun=55; chaser.stun=90; flash=14; caught++;
+  showToast('CAUGHT! Go read a station to shake the Skeptic');
+}
+
+/* ---------- INPUT ---------- */
+const keys={};
+const held={up:false,down:false,left:false,right:false,sprint:false};
+addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase();
+  if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)) e.preventDefault();
+  keys[k]=true;
+  if(k==='e'||k===' ') interact();
+});
+addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
+// mobile
+document.querySelectorAll('#pad button').forEach(b=>{
+  const dir=b.dataset.k;
+  const on=e=>{e.preventDefault();held[dir]=true;};
+  const off=e=>{e.preventDefault();held[dir]=false;};
+  b.addEventListener('touchstart',on);b.addEventListener('touchend',off);
+  b.addEventListener('mousedown',on);b.addEventListener('mouseup',off);b.addEventListener('mouseleave',off);
+});
+document.getElementById('act').addEventListener('touchstart',e=>{e.preventDefault();interact();});
+document.getElementById('act').addEventListener('click',e=>{e.preventDefault();interact();});
+{const sb=document.getElementById('sprintBtn');
+ const son=e=>{e.preventDefault();held.sprint=true;}, soff=e=>{e.preventDefault();held.sprint=false;};
+ sb.addEventListener('touchstart',son);sb.addEventListener('touchend',soff);
+ sb.addEventListener('mousedown',son);sb.addEventListener('mouseup',soff);sb.addEventListener('mouseleave',soff);}
+
+/* ---------- STATE ---------- */
+let started=false, dialogOpen=false, near=null, won=false;
+const promptEl=document.getElementById('prompt');
+const dialogEl=document.getElementById('dialog');
+const zoneEl=document.getElementById('zone');
+const progEl=document.getElementById('prog');
+const winEl=document.getElementById('win');
+const stamFill=document.getElementById('stamfill');
+const chaseEl=document.getElementById('chase');
+
+// sync station-count labels from data so they never drift
+progEl.textContent='EXPLORED 0/'+TOTAL;
+{const sc=document.getElementById('startCount'); if(sc) sc.textContent=TOTAL;}
+document.getElementById('startBtn').onclick=()=>{document.getElementById('start').style.display='none';started=true;};
+document.getElementById('closeBtn').onclick=closeDialog;
+
+function nearestStation(){
+  const cx=player.x+player.w/2, cy=player.y+player.h/2;
+  let best=null,bd=1e9;
+  for(const s of stations){
+    const sx=s.x*TILE+TILE/2, sy=s.y*TILE+TILE/2;
+    const d=Math.hypot(cx-sx,cy-sy);
+    if(d<54 && d<bd){bd=d;best=s;}
+  }
+  return best;
+}
+function interact(){
+  if(!started)return;
+  if(won){winEl.style.display='none';won=false;return;}
+  if(dialogOpen){closeDialog();return;}
+  if(near){openDialog(near);}
+}
+function openDialog(s){
+  dialogOpen=true;
+  document.getElementById('cardTitle').textContent=s.title;
+  document.getElementById('cardSub').textContent=s.sub||'';
+  document.getElementById('cardBody').innerHTML=s.html;
+  dialogEl.style.display='flex';
+  promptEl.style.display='none';
+  if(!s.seen){
+    s.seen=true; updateProgress();
+    // proof shown -> the Skeptic is stunned for ~5.5s and shoved back
+    chaser.stun=Math.max(chaser.stun,330);
+    if(!complete) showToast('PROOF! The Skeptic backs off');
+  }
+}
+function closeDialog(){dialogOpen=false;dialogEl.style.display='none';}
+const toastEl=document.getElementById('toast');
+let toastTimer=null;
+function showToast(msg){
+  toastEl.textContent=msg;toastEl.style.display='block';
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.style.display='none',2400);
+}
+function updateProgress(){
+  const n=stations.filter(s=>s.seen).length;
+  progEl.textContent='EXPLORED '+n+'/'+TOTAL;
+  if(n===TOTAL){
+    complete=true;
+    if(!won){winEl.style.display='block';won=true;}
+  }
+}
+
+/* ---------- UPDATE ---------- */
+function update(){
+  if(!started||dialogOpen){player.moving=false;return;}
+
+  if(player.stun>0){
+    player.stun--; player.moving=false; player.frame=0;
+  } else {
+    let dx=0,dy=0;
+    if(keys['arrowup']||keys['w']||held.up)dy-=1;
+    if(keys['arrowdown']||keys['s']||held.down)dy+=1;
+    if(keys['arrowleft']||keys['a']||held.left)dx-=1;
+    if(keys['arrowright']||keys['d']||held.right)dx+=1;
+    if(dx&&dy){dx*=0.7071;dy*=0.7071;}
+    player.moving=!!(dx||dy);
+    if(dy<0)player.dir='up';else if(dy>0)player.dir='down';
+    else if(dx<0)player.dir='left';else if(dx>0)player.dir='right';
+
+    // sprint (Shift / mobile dash) drains stamina; regen when not sprinting
+    const wantSprint=(keys['shift']||held.sprint);
+    const sprinting=wantSprint && player.stam>1 && player.moving;
+    player.spd=sprinting?3.7:2.4;
+    if(sprinting) player.stam=Math.max(0,player.stam-1.2);
+    else player.stam=Math.min(100,player.stam+0.55);
+
+    let nx=player.x+dx*player.spd;
+    if(!rectSolid(nx,player.y,player.w,player.h))player.x=nx;
+    let ny=player.y+dy*player.spd;
+    if(!rectSolid(player.x,ny,player.w,player.h))player.y=ny;
+    if(player.moving)player.frame+=sprinting?0.28:0.18; else player.frame=0;
+  }
+
+  // zone label  (zone = [x1,y1,x2,y2,color,label,lx,ly])
+  const z=zoneAt(Math.floor((player.x+player.w/2)/TILE),Math.floor((player.y+player.h/2)/TILE));
+  zoneEl.textContent=z?z[5]:'OFFICE';
+
+  updateChaser();
+
+  // HUD: stamina bar + skeptic status
+  if(stamFill){ stamFill.style.width=player.stam+'%'; stamFill.style.background=player.stam<25?'#ff5470':'#5fd068'; }
+  if(chaseEl){
+    if(complete){chaseEl.textContent='SKEPTIC: CONVINCED ✓';chaseEl.style.color='#5fd068';}
+    else if(chaser.state==='stunned'){chaseEl.textContent='SKEPTIC: STUNNED';chaseEl.style.color='#56c2ff';}
+    else if(chaser.state==='idle'){chaseEl.textContent='SKEPTIC: WAKING…';chaseEl.style.color='#ffcb3c';}
+    else {chaseEl.textContent='SKEPTIC: HUNTING';chaseEl.style.color='#ff5470';}
+  }
+
+  near=nearestStation();
+  if(near){
+    promptEl.style.display='block';
+    promptEl.textContent='▲ Read '+near.label+'  [E]';
+  } else promptEl.style.display='none';
+}
+
+/* ---------- CAMERA ---------- */
+function camera(){
+  let cx=player.x+player.w/2-VIEW_W/2;
+  let cy=player.y+player.h/2-VIEW_H/2;
+  cx=Math.max(0,Math.min(cx,COLS*TILE-VIEW_W));
+  cy=Math.max(0,Math.min(cy,ROWS*TILE-VIEW_H));
+  return {cx,cy};
+}
+
+/* ---------- RENDER ---------- */
+function shade(hex,amt){
+  const n=parseInt(hex.slice(1),16);
+  let r=(n>>16)+amt, g=((n>>8)&255)+amt, b=(n&255)+amt;
+  r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b));
+  return 'rgb('+r+','+g+','+b+')';
+}
+function drawFloor(cam){
+  for(let y=0;y<ROWS;y++){
+    for(let x=0;x<COLS;x++){
+      const sx=Math.round(x*TILE-cam.cx), sy=Math.round(y*TILE-cam.cy);
+      if(sx<-TILE||sy<-TILE||sx>VIEW_W||sy>VIEW_H)continue;
+      if(map[y][x]==='#'){
+        ctx.fillStyle='#0c0720';ctx.fillRect(sx,sy,TILE,TILE);
+        ctx.fillStyle='#2a1c4d';ctx.fillRect(sx+2,sy+2,TILE-4,TILE-6);
+        ctx.fillStyle='#3d2a66';ctx.fillRect(sx+2,sy+2,TILE-4,3);
+      } else {
+        const z=zoneAt(x,y);
+        const base=z?z[4]:'#171029';
+        ctx.fillStyle=base;ctx.fillRect(sx,sy,TILE,TILE);
+        // checker + grid for floor texture
+        if((x+y)%2===0){ctx.fillStyle=shade(base,8);ctx.fillRect(sx,sy,TILE,TILE);}
+        ctx.strokeStyle='rgba(0,0,0,0.18)';ctx.strokeRect(sx+0.5,sy+0.5,TILE,TILE);
+      }
+    }
+  }
+}
+function drawDoors(cam){
+  const t=Date.now()/300;
+  for(const d of doors){
+    const sx=Math.round(d.x*TILE-cam.cx), sy=Math.round(d.y*TILE-cam.cy);
+    if(sx<-TILE||sx>VIEW_W||sy<-TILE||sy>VIEW_H)continue;
+    if(d.open){
+      // open doorway: floor is already drawn; add frame posts + soft green glow
+      ctx.fillStyle='#0c0720';
+      if(d.o==='v'){ctx.fillRect(sx,sy,5,TILE);ctx.fillRect(sx+TILE-5,sy,5,TILE);}
+      else{ctx.fillRect(sx,sy,TILE,5);ctx.fillRect(sx,sy+TILE-5,TILE,5);}
+      ctx.fillStyle='rgba(95,208,104,0.18)';ctx.fillRect(sx+5,sy+5,TILE-10,TILE-10);
+      ctx.fillStyle='#5fd068';ctx.font='7px "Press Start 2P", monospace';ctx.textBaseline='top';
+      ctx.fillText('✓',sx+TILE/2-3,sy+TILE/2-4);
+    } else {
+      // closed wooden door with lock
+      ctx.fillStyle='#0c0720';ctx.fillRect(sx,sy,TILE,TILE);
+      ctx.fillStyle='#6b4118';ctx.fillRect(sx+3,sy+2,TILE-6,TILE-4);   // door panel
+      ctx.fillStyle='#7d4e1e';ctx.fillRect(sx+3,sy+2,TILE-6,3);        // top light
+      ctx.fillStyle='#4f2f10';ctx.fillRect(sx+TILE/2-1,sy+2,2,TILE-4); // plank seam
+      ctx.fillStyle='#ffcb3c';ctx.fillRect(sx+TILE-9,sy+TILE/2-1,3,3); // knob
+      // lock badge (pulsing)
+      const p=(Math.sin(t)*0.5+0.5);
+      ctx.fillStyle='#1b1033';ctx.fillRect(sx+TILE/2-6,sy+TILE/2-5,12,11);
+      ctx.fillStyle='rgba(255,84,112,'+(0.6+0.4*p)+')';
+      ctx.fillRect(sx+TILE/2-4,sy+TILE/2,8,5);                          // lock body
+      ctx.strokeStyle='rgba(255,84,112,'+(0.6+0.4*p)+')';ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(sx+TILE/2,sy+TILE/2-1,3,Math.PI,0);ctx.stroke(); // shackle
+      ctx.lineWidth=1;
+    }
+  }
+}
+function drawZoneLabels(cam){
+  ctx.font='8px "Press Start 2P", monospace';
+  ctx.textBaseline='top';
+  for(const z of zones){
+    const sx=Math.round(z[6]*TILE-cam.cx), sy=Math.round(z[7]*TILE-cam.cy);
+    if(sx<-200||sx>VIEW_W||sy<-20||sy>VIEW_H)continue;
+    ctx.fillStyle='rgba(0,0,0,0.55)';
+    ctx.fillText(z[5],sx+1,sy+1);
+    ctx.fillStyle='#ffcb3c';
+    ctx.fillText(z[5],sx,sy);
+  }
+}
+function drawStation(s,cam){
+  const sx=Math.round(s.x*TILE-cam.cx), sy=Math.round(s.y*TILE-cam.cy);
+  if(sx<-TILE||sx>VIEW_W||sy<-TILE||sy>VIEW_H)return;
+  // shadow
+  ctx.fillStyle='rgba(0,0,0,0.35)';ctx.beginPath();
+  ctx.ellipse(sx+TILE/2,sy+TILE-3,11,4,0,0,Math.PI*2);ctx.fill();
+  if(s.type==='npc'){
+    // little person
+    const bx=sx+8, by=sy+4;
+    ctx.fillStyle='#1b1033';ctx.fillRect(bx-1,by-1,18,28); // outline
+    ctx.fillStyle=s.c;ctx.fillRect(bx,by+9,16,15);        // body
+    ctx.fillStyle='#f2c79b';ctx.fillRect(bx+3,by,10,10);  // head
+    ctx.fillStyle='#1b1033';ctx.fillRect(bx+4,by+8,2,2);ctx.fillRect(bx+10,by+8,2,2); // hair line/eyes
+    ctx.fillStyle=shade(s.c,-30);ctx.fillRect(bx,by+9,16,3); // collar
+    // bobbing label tag
+    ctx.fillStyle=s.seen?'#5fd068':'#ffcb3c';
+  } else {
+    // object/terminal box
+    const bx=sx+4, by=sy+4;
+    ctx.fillStyle='#1b1033';ctx.fillRect(bx-1,by-1,26,26);
+    ctx.fillStyle=shade(s.c,-40);ctx.fillRect(bx,by,24,24);
+    ctx.fillStyle=s.c;ctx.fillRect(bx+2,by+2,20,14);
+    ctx.fillStyle='#0c0720';ctx.fillRect(bx+4,by+4,16,9); // screen
+    ctx.fillStyle=s.seen?'#5fd068':'#56c2ff';ctx.fillRect(bx+5,by+5,14,7);
+    ctx.fillStyle=s.seen?'#5fd068':'#ffcb3c';
+  }
+  // 2-letter chip above
+  ctx.font='7px "Press Start 2P", monospace';ctx.textBaseline='top';
+  const txt=s.k.length>2?s.k.slice(0,2):s.k;
+  ctx.fillStyle='rgba(12,7,32,0.85)';ctx.fillRect(sx+5,sy-12,22,11);
+  ctx.fillStyle=s.seen?'#5fd068':'#ffcb3c';
+  ctx.fillText(txt,sx+8,sy-11);
+  // seen check
+  if(s.seen){ctx.fillStyle='#5fd068';ctx.font='7px "Press Start 2P", monospace';ctx.fillText('✓',sx+TILE-9,sy-11);}
+}
+function drawPlayer(cam){
+  const sx=Math.round(player.x-cam.cx), sy=Math.round(player.y-cam.cy);
+  ctx.fillStyle='rgba(0,0,0,0.35)';ctx.beginPath();
+  ctx.ellipse(sx+player.w/2,sy+player.h-1,11,4,0,0,Math.PI*2);ctx.fill();
+  const step=Math.floor(player.frame)%2; const yo=player.moving?(step?0:-1):0;
+  // outline
+  ctx.fillStyle='#0c0720';ctx.fillRect(sx-1,sy-1+yo,player.w+2,player.h+2);
+  // body
+  ctx.fillStyle='#ff5470';ctx.fillRect(sx,sy+9+yo,player.w,player.h-9);
+  ctx.fillStyle='#ffcb3c';ctx.fillRect(sx,sy+9+yo,player.w,3); // belt/stripe
+  // head
+  ctx.fillStyle='#f2c79b';ctx.fillRect(sx+4,sy+yo,player.w-8,10);
+  ctx.fillStyle='#3a2a1a';ctx.fillRect(sx+4,sy+yo,player.w-8,3); // hair
+  // face by direction
+  ctx.fillStyle='#1b1033';
+  if(player.dir==='down'){ctx.fillRect(sx+6,sy+5+yo,2,2);ctx.fillRect(sx+12,sy+5+yo,2,2);}
+  else if(player.dir==='up'){/* back of head */ctx.fillStyle='#2a1d10';ctx.fillRect(sx+4,sy+yo,player.w-8,7);}
+  else if(player.dir==='left'){ctx.fillRect(sx+5,sy+5+yo,2,2);}
+  else {ctx.fillRect(sx+13,sy+5+yo,2,2);}
+  // legs
+  ctx.fillStyle='#2b2150';
+  const lo=player.moving?(step?2:-2):0;
+  ctx.fillRect(sx+2,sy+player.h-3+yo,6,4+(player.moving?lo:0)>0?4:4);
+  ctx.fillRect(sx+2,sy+player.h-3+yo,6,4);
+  ctx.fillRect(sx+player.w-8,sy+player.h-3+yo,6,4);
+}
+function drawChaser(cam){
+  if(complete)return;                 // convinced -> gone
+  const sx=Math.round(chaser.x-cam.cx), sy=Math.round(chaser.y-cam.cy);
+  const stunned=chaser.state==='stunned', idle=chaser.state==='idle';
+  ctx.fillStyle='rgba(0,0,0,0.35)';ctx.beginPath();
+  ctx.ellipse(sx+chaser.w/2,sy+chaser.h-1,11,4,0,0,Math.PI*2);ctx.fill();
+  const step=Math.floor(chaser.frame)%2; const yo=(!stunned&&!idle)?(step?0:-1):0;
+  // floating menace: dark cloak + glowing eyes
+  ctx.fillStyle='#0c0720';ctx.fillRect(sx-1,sy-1+yo,chaser.w+2,chaser.h+2);
+  ctx.fillStyle=stunned?'#3a4a6a':'#5a1530';ctx.fillRect(sx,sy+yo,chaser.w,chaser.h);   // cloak
+  ctx.fillStyle=stunned?'#52608a':'#7a1f42';ctx.fillRect(sx+2,sy+2+yo,chaser.w-4,5);     // hood top
+  // jagged hem
+  ctx.fillStyle='#0c0720';
+  for(let i=0;i<chaser.w;i+=4){ctx.fillRect(sx+i,sy+chaser.h-3+yo,2,3);}
+  // eyes
+  ctx.fillStyle=stunned?'#9fb3ff':'#ffd23c';
+  ctx.fillRect(sx+5,sy+8+yo,4,3);ctx.fillRect(sx+chaser.w-9,sy+8+yo,4,3);
+  if(!stunned){ctx.fillStyle='#ff3b3b';ctx.fillRect(sx+6,sy+9+yo,2,2);ctx.fillRect(sx+chaser.w-8,sy+9+yo,2,2);}
+  // status bubble
+  ctx.font='8px "Press Start 2P", monospace';ctx.textBaseline='top';
+  ctx.fillStyle=stunned?'#56c2ff':(idle?'#ffcb3c':'#ff5470');
+  const bub=stunned?'★':(idle?'z':'?');
+  ctx.fillText(bub,sx+chaser.w/2-3,sy-12+yo);
+}
+function render(){
+  const cam=camera();
+  ctx.fillStyle='#0c0720';ctx.fillRect(0,0,VIEW_W,VIEW_H);
+  drawFloor(cam);
+  drawDoors(cam);
+  drawZoneLabels(cam);
+  // draw stations, chaser & player sorted by y for depth
+  const drawables=stations.map(s=>({y:s.y*TILE,fn:()=>drawStation(s,cam)}));
+  drawables.push({y:player.y,fn:()=>drawPlayer(cam)});
+  if(!complete) drawables.push({y:chaser.y,fn:()=>drawChaser(cam)});
+  drawables.sort((a,b)=>a.y-b.y).forEach(d=>d.fn());
+  // caught flash
+  if(flash>0){ ctx.fillStyle='rgba(255,60,80,'+(flash/14*0.4)+')';ctx.fillRect(0,0,VIEW_W,VIEW_H); flash--; }
+}
+
+/* ---------- LOOP ---------- */
+function loop(){update();render();requestAnimationFrame(loop);}
+loop();
+})();
+</script>
+</body>
+</html>
