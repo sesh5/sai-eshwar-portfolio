@@ -116,7 +116,7 @@
 </style>
 </head>
 <body>
-<a href="index.html" style="position:fixed;top:10px;left:12px;z-index:60;font-family:'Press Start 2P',monospace;font-size:8px;color:#0e0820;background:#ffcb3c;border:3px solid #1b1033;padding:8px 10px;text-decoration:none;box-shadow:3px 3px 0 rgba(0,0,0,.5)">◀ PORTFOLIO</a>
+<a href="index-v2.html" style="position:fixed;top:10px;left:12px;z-index:60;font-family:'Press Start 2P',monospace;font-size:8px;color:#0e0820;background:#ffcb3c;border:3px solid #1b1033;padding:8px 10px;text-decoration:none;box-shadow:3px 3px 0 rgba(0,0,0,.5)">◀ PORTFOLIO</a>
 <div id="wrap">
 <div id="stage">
   <canvas id="game" width="832" height="576"></canvas>
@@ -139,7 +139,7 @@
   <button id="act">E</button>
   <button id="sprintBtn">DASH</button>
 
-  <div id="win">★ THE SKEPTIC IS CONVINCED ★<br><br>You showed all 19 proofs.<br>Now hire Sai. :)<br><br><span style="font-size:8px">Press E to close</span></div>
+  <div id="win">★ THE SKEPTIC IS CONVINCED ★<br><br>You showed all <span id="winCount">20</span> proofs.<br>Now hire Sai. :)<br><br><span style="font-size:8px">Press E to close</span></div>
 
   <div id="dialog">
     <div id="card">
@@ -219,7 +219,7 @@ function zoneAt(tx,ty){for(const z of zones){if(tx>=z[0]&&tx<=z[2]&&ty>=z[1]&&ty
 const stations=[
   {x:3,y:3,c:'#ffcb3c',k:'NPC',label:'Receptionist',type:'npc',
    title:'WELCOME, SAI ESHWAR',sub:'Curious builder · problem finder',
-   html:`<div class="plain">Hi, I'm <b>Sai Eshwar</b>, a curious builder who finds real user problems and builds products that solve them. AWS Certified AI Practitioner &amp; published researcher.</div>
+   html:`<div class="plain">Hi, I'm <b>Sai Eshwar</b>, a curious builder who finds real user problems and builds products that solve them. AWS Certified AI Practitioner, Certified ScrumMaster&reg; &amp; published researcher.</div>
    <div class="meta">CONTACT</div>
    <ul>
    <li>India • +91 73387 79995</li>
@@ -241,7 +241,8 @@ const stations=[
    html:`<div class="role">Senior Solution &amp; Customer Experience Specialist</div>
    <div class="meta">Chennai, India</div>
    <ul>
-   <li>Own end to end implementation of sales compensation projects for enterprise clients with 500K+ ARR, configuring systems that impact 1,000+ payees per org; primary liaison for international stakeholders.</li>
+   <li>Grew with the business as it scaled from $5M to $10M ARR, holding implementation quality steady while enterprise account volume climbed.</li>
+   <li>Own end to end implementation of sales compensation projects for enterprise clients with $500K+ ARR, configuring systems that impact 1,000+ payees per org; primary liaison for international stakeholders.</li>
    <li>Mine &amp; transform large CRM datasets (Salesforce, HubSpot, Stripe) with SQL &amp; Python to find compensation logic gaps and inform product decisions.</li>
    <li>Build multi view Apache Superset dashboards tracking MRR, CAC, TCV and quota attainment for real time leadership decisions.</li>
    <li>Bridge product, engineering &amp; customer success to define requirements and ship automated metric solutions that cut manual overhead.</li>
@@ -312,13 +313,22 @@ const stations=[
    </ul>
    <div class="meta">STACK</div><div class="plain">Churn Prediction · Customer Analytics · AI · Health Scores</div>`},
 
-  {x:11,y:13,c:'#56c2ff',k:'RR',type:'obj',label:'RivalRadar',
-   title:'RIVALRADAR',sub:'2025 • Competitive Intel',
+  {x:11,y:13,c:'#56c2ff',k:'CA',type:'obj',label:'Content Arena',
+   title:'CONTENT ARENA',sub:'2025 • Competitive Intel',
    html:`<ul>
-   <li>A competitor intelligence platform for YouTube creators that turns "who is my competition really?" into structured, normalized engagement signals.</li>
-   <li>Maps discoverable channels and compares them on like for like engagement metrics.</li>
+   <li>A competitor intelligence platform for YouTube creators that turns "who is my competition really?" into structured, normalised engagement signals.</li>
+   <li>Discovers comparable channels and compares them on like for like engagement metrics, so creators see which levers actually separate them, not gut feel.</li>
    </ul>
    <div class="meta">STACK</div><div class="plain">YouTube · Competitor Intel · Engagement Signals · AI</div>`},
+
+  {x:3,y:16,c:'#5fd068',k:'NA',type:'obj',label:'NourishAI',
+   title:'NOURISHAI',sub:'2026 • AI Search × LLM Data Pipeline',
+   html:`<ul>
+   <li>A food search engine that understands "high protein, under 500 cal, not fried" in plain English and returns ranked dishes, not restaurants.</li>
+   <li>Restaurant menus have no public nutrition data, so I manufactured the missing layer: a Generate → Enrich → Load LLM pipeline (calories, macros &amp; dietary tags per dish, reconciled) into Supabase Postgres.</li>
+   <li>Search runs through a Supabase Edge Function: parseIntent() sends the raw sentence to Claude Haiku for structured rules, runSearch() filters &amp; ranks dishes. The API key never touches the browser.</li>
+   </ul>
+   <div class="meta">STACK</div><div class="plain">Claude API · Supabase Edge Functions · PostgreSQL · LLM Data Pipeline</div>`},
 
   {x:7,y:16,c:'#5fd068',k:'TN',type:'obj',label:'TN Election',
    title:'DECODING THE 2026 TN ELECTION',sub:'2026 • Data Storytelling',
@@ -341,17 +351,19 @@ const stations=[
    title:'CERTIFICATIONS',sub:'2026',
    html:`<ul>
    <li>AWS Certified AI Practitioner, AWS · <a href="https://www.credly.com/badges/a8e058bc-98f3-436e-8871-6b1605e75144/public_url" target="_blank">Credly ↗</a></li>
+   <li>Certified ScrumMaster&reg; (CSM), Scrum Alliance · active through 2028 · ID 001835325 · <a href="https://www.scrumalliance.org/members/search" target="_blank">Verify ↗</a></li>
    <li>AWS Certified Cloud Practitioner, AWS · <a href="https://www.credly.com/badges/c7dfbae0-b392-4c11-82e8-4fca44d26d8f/public_url" target="_blank">Credly ↗</a></li>
    <li>Tech for PM, HelloPM · <a href="https://hellopm.co/certificate/?certificate_id=SJHMZV" target="_blank">Certificate ↗</a></li>
+   <li>In progress: AWS Certified ML Engineer, Associate</li>
    </ul>`},
 
   {x:32,y:11,c:'#5fd068',k:'>_',type:'obj',label:'Skills Terminal',
    title:'TECHNICAL SKILLS',sub:'~/skills',
    html:`<ul>
-   <li><b>Languages &amp; Data:</b> SQL, Python</li>
-   <li><b>Tools &amp; Platforms:</b> Apache Superset, N8N, Fathom, Freshdesk, Salesforce, HubSpot, Stripe, Supabase, Lovable</li>
-   <li><b>Cloud &amp; Infra:</b> AWS, Raspberry Pi, MQTT, NS3</li>
-   <li><b>PM &amp; Collab:</b> Stakeholder Mgmt, Agile, Cross functional Execution, Requirements Definition, KPI Reporting, Market Research</li>
+   <li><b>Languages &amp; Data:</b> SQL, Python, Pandas, Apache Superset</li>
+   <li><b>AI &amp; Automation:</b> Claude API, RAG Pipelines, N8N, ElevenLabs, Prompt Engineering, AWS AI Services</li>
+   <li><b>Tools &amp; Platforms:</b> AWS, Supabase, Salesforce, HubSpot, Stripe, Freshdesk, Fathom, Lovable</li>
+   <li><b>PM &amp; Collab:</b> Stakeholder Mgmt, Agile &amp; Scrum (CSM), Cross functional Execution, Requirements Definition, KPI Reporting, Market Research</li>
    </ul>`},
 
   // Volunteering band
@@ -516,6 +528,7 @@ const chaseEl=document.getElementById('chase');
 // sync station-count labels from data so they never drift
 progEl.textContent='EXPLORED 0/'+TOTAL;
 {const sc=document.getElementById('startCount'); if(sc) sc.textContent=TOTAL;}
+{const wc=document.getElementById('winCount'); if(wc) wc.textContent=TOTAL;}
 document.getElementById('startBtn').onclick=()=>{document.getElementById('start').style.display='none';started=true;};
 document.getElementById('closeBtn').onclick=closeDialog;
 
