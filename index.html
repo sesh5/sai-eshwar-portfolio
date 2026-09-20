@@ -224,6 +224,7 @@
   .edu .detail span:last-child{color:var(--text);font-weight:500;text-align:right}
 
   /* PUBLICATION */
+  .pub-list{display:grid;gap:18px;margin-top:34px}
   .pub{background:linear-gradient(135deg,var(--surface),var(--bg-soft));border:1px solid var(--border);border-radius:var(--radius);padding:30px;display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap;position:relative;overflow:hidden}
   .pub::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
   .pub-icon{font-size:28px}
@@ -386,7 +387,7 @@
         <div class="stat"><div class="num">$<span data-count="500">0</span>K<i>+</i></div><div class="lbl">ARR of enterprise accounts owned end to end</div></div>
         <div class="stat"><div class="num"><span data-count="1000">0</span><i>+</i></div><div class="lbl">payees per org impacted by my comp configurations</div></div>
         <div class="stat"><div class="num">$5M <i>&rarr;</i> $<span data-count="10">0</span>M</div><div class="lbl">ARR scale of the business I helped grow at Everstage</div></div>
-        <div class="stat"><div class="num"><span data-count="1">0</span></div><div class="lbl">peer reviewed publication in Springer Nature, open access</div></div>
+        <div class="stat"><div class="num"><span data-count="2">0</span></div><div class="lbl">peer reviewed journal publications, Springer Nature and Pleiades</div></div>
       </div>
     </div>
   </section>
@@ -423,11 +424,30 @@
       <p class="sec-sub reveal">Every project below follows the same loop: find the friction, build the fix, measure what changed. Click any card for the full problem &rarr; approach &rarr; outcome story.</p>
       <div class="filters reveal" role="group" aria-label="Filter projects">
         <button class="filter on" data-filter="all">All</button>
+        <button class="filter" data-filter="product">Product &amp; Strategy</button>
         <button class="filter" data-filter="ai">AI &amp; Automation</button>
         <button class="filter" data-filter="data">Data &amp; Analytics</button>
         <button class="filter" data-filter="research">Research &amp; Security</button>
       </div>
       <div class="cs-grid">
+
+        <article class="cs reveal" data-cat="product data">
+          <button class="cs-btn" aria-expanded="false">
+            <div class="cs-top"><div class="cs-icon">&#127918;</div><span class="cs-year">2026</span></div>
+            <h3>Product Management Job Simulation</h3>
+            <div class="sub">forage &middot; kpi selection &middot; stakeholder comms</div>
+            <p class="teaser">A mobile game is growing downloads and losing players. Pick the KPI that actually answers each question, then plan the deck that gets three teams to agree.</p>
+            <span class="more">Read the case study <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span>
+          </button>
+          <div class="cs-detail">
+            <div class="cs-detail-inner">
+              <div class="cs-block"><h5>Problem</h5><p>Forage's Product Management Job Simulation, completed September 2026. The brief: <i>Legends of Aether</i>, a strategy RPG mobile game, has rising downloads but a product team that cannot agree on what the numbers mean. Two tasks, both the everyday work of a PM &mdash; <b>Understanding Product Performance</b> and <b>Planning a Stakeholder Presentation</b>.</p></div>
+              <div class="cs-block"><h5>Approach</h5><p>Task one: recommended one KPI per business question and argued why the near miss was wrong. Seven day <b>retention rate</b> over DAU for new player stickiness, because DAU mixes new players in with veterans and a busy day hides a quiet drop off. <b>DAU</b> for community size, <b>churn rate</b> for players already lost, <b>conversion rate</b> for campaign purchases over ARPU, which measures money rather than how many players bought.</p><p>Task two: built a seven step project plan for the stakeholder deck &mdash; confirm the objective, validate every finding against source data, prioritise the insights into one storyline, outline, draft, collect feedback, revise and approve. Each step carries its owner, expected output, dependency and named approval point.</p></div>
+              <div class="cs-block"><h5>Outcome</h5><p>A KPI brief with a worked number behind every recommendation (10,000 installs and 3,000 returners is 30% retention; 20,000 actives and 2,500 lost is 12.5% churn), and a project plan that separates three audiences rather than writing one deck for everyone: <b>development</b> gets where new players drop off, <b>marketing</b> gets which segments the campaign actually brought in, <b>leadership</b> gets the business risk and what to fund. Caveats travel with the data &mdash; the onboarding to session length link is flagged as correlation, not cause.</p></div>
+              <div class="tags"><span class="tag">KPI Design</span><span class="tag">Retention &amp; Churn</span><span class="tag">Stakeholder Management</span><span class="tag">Product Analytics</span></div>
+            </div>
+          </div>
+        </article>
 
         <article class="cs reveal" data-cat="ai data">
           <button class="cs-btn" aria-expanded="false">
@@ -730,18 +750,30 @@
     </div>
   </section>
 
-  <!-- PUBLICATION -->
+  <!-- PUBLICATIONS -->
   <section id="publication">
     <div class="wrap">
-      <div class="sec-head reveal"><span class="sec-num">06</span><h2 class="sec-title">Publication</h2></div>
-      <div class="pub reveal">
-        <div class="pub-icon">&#128196;</div>
-        <div class="pub-body">
-          <h3>Improving Security in 5G Vehicular Networks Using ASCON and Machine Learning based NIDS</h3>
-          <div class="meta">Discover Internet of Things Journal &middot; Springer Nature &middot; Open Access</div>
-          <a href="https://doi.org/10.1007/s43926-025-00226-1" target="_blank" rel="noopener" class="doi">doi.org/10.1007/s43926-025-00226-1 &#8599;</a>
+      <div class="sec-head reveal"><span class="sec-num">06</span><h2 class="sec-title">Publications</h2></div>
+      <p class="sec-sub reveal">Two peer reviewed journal papers on securing vehicular networks, both from the ASCON research line.</p>
+      <div class="pub-list">
+        <div class="pub reveal">
+          <div class="pub-icon">&#128196;</div>
+          <div class="pub-body">
+            <h3>Quantum-Resistant Microelectronic Cryptography for Securing Vehicular Networks</h3>
+            <div class="meta">Russian Microelectronics, Vol. 55, No. 1 &middot; Pleiades Publishing, distributed by Springer Nature &middot; Scopus indexed</div>
+            <a href="https://doi.org/10.1134/S106373972660007X" target="_blank" rel="noopener" class="doi">doi.org/10.1134/S106373972660007X &#8599;</a>
+          </div>
+          <span class="pub-year">2026</span>
         </div>
-        <span class="pub-year">2025</span>
+        <div class="pub reveal">
+          <div class="pub-icon">&#128196;</div>
+          <div class="pub-body">
+            <h3>Improving Security in 5G Vehicular Networks Using ASCON and Machine Learning based NIDS</h3>
+            <div class="meta">Discover Internet of Things Journal &middot; Springer Nature &middot; Open Access</div>
+            <a href="https://doi.org/10.1007/s43926-025-00226-1" target="_blank" rel="noopener" class="doi">doi.org/10.1007/s43926-025-00226-1 &#8599;</a>
+          </div>
+          <span class="pub-year">2025</span>
+        </div>
       </div>
     </div>
   </section>
@@ -965,7 +997,8 @@ document.querySelectorAll('.filter').forEach(f=>{
   const LINKS={
     mail:'<a href="mailto:seshwarsai@gmail.com">seshwarsai@gmail.com</a>',
     li:'<a href="https://linkedin.com/in/sai-eshwar-s-b529931bb" target="_blank" rel="noopener">linkedin.com/in/sai-eshwar-s</a>',
-    pub:'<a href="https://doi.org/10.1007/s43926-025-00226-1" target="_blank" rel="noopener">doi.org/10.1007/s43926-025-00226-1</a>'
+    pub:'<a href="https://doi.org/10.1007/s43926-025-00226-1" target="_blank" rel="noopener">doi.org/10.1007/s43926-025-00226-1</a>',
+    pub2:'<a href="https://doi.org/10.1134/S106373972660007X" target="_blank" rel="noopener">doi.org/10.1134/S106373972660007X</a>'
   };
   const CMDS={
     help:[
@@ -975,7 +1008,7 @@ document.querySelectorAll('.filter').forEach(f=>{
       '<span class="c-txt">/experience</span>  Everstage &middot; University of Cyprus',
       '<span class="c-txt">/certs</span>       AWS &times;3 &middot; CSM &middot; Tech for PM',
       '<span class="c-txt">/education</span>   NUS MSc (in progress) &middot; B.E. ECE, first class with distinction',
-      '<span class="c-txt">/publication</span> Springer Nature, 2025',
+      '<span class="c-txt">/publications</span> Springer Nature 2025 &middot; Russian Microelectronics 2026',
       '<span class="c-txt">/leadership</span>  NSS &middot; INVENTE &middot; INSTINCTS',
       '<span class="c-txt">/contact</span>     hire him',
       '<span class="c-txt">/clear</span>       wipe the screen &middot; <span class="c-txt">/exit</span> close',
@@ -987,13 +1020,14 @@ document.querySelectorAll('.filter').forEach(f=>{
       '',
       'Currently pursuing an <span class="c-txt">MSc in Management of Technology and Innovation</span> at NUS. Previously Senior Solution &amp; CX Specialist at <span class="c-txt">Everstage</span> (B2B SaaS, sales compensation, May 2024 &ndash; Jun 2026): owned enterprise implementations end to end &mdash; $500K+ ARR accounts, configurations touching 1,000+ payees per org, while the business scaled $5M &rarr; $10M ARR.',
       '',
-      'Builder on the side: 10 shipped projects across AI, automation and data (<span class="c-txt">/projects</span>). Published researcher (Springer Nature, 2025). AWS Certified AI Practitioner, Cloud Practitioner &amp; Machine Learning Engineer &ndash; Associate, Certified ScrumMaster&reg;, HelloPM Tech for PM.',
+      'Builder on the side: 10 shipped projects across AI, automation and data (<span class="c-txt">/projects</span>). Published researcher &mdash; two peer-reviewed journal papers (Springer Nature 2025, Russian Microelectronics 2026). AWS Certified AI Practitioner, Cloud Practitioner &amp; Machine Learning Engineer &ndash; Associate, Certified ScrumMaster&reg;, HelloPM Tech for PM.',
       '',
       '<span class="c-dim">Operating principle: find the friction people quietly live with, build the fix, measure what changed.</span>'
     ],
     projects:[
       '<span class="c-acc">shipped</span> <span class="c-dim">&middot; ask about any of them by name</span>',
       '',
+      '<span class="c-txt">PM Job Simulation</span> <span class="c-dim">Forage, 2026</span> — KPI selection and a 7-step stakeholder-deck plan for a mobile game losing players.',
       '<span class="c-txt">NourishAI</span> <span class="c-dim">2026</span> — food search that understands &ldquo;high-protein, under 500 cal, not fried&rdquo;. Claude + Supabase Edge Functions.',
       '<span class="c-txt">TN Election 2026 teardown</span> <span class="c-dim">2026</span> — 8,000+ ECI rows &rarr; the story of 163/234 seats flipping.',
       '<span class="c-txt">AI Voice Agent</span> <span class="c-dim">2025</span> — L1 support calls answered autonomously. ElevenLabs + RAG.',
@@ -1038,7 +1072,11 @@ document.querySelectorAll('.filter').forEach(f=>{
       '<span class="c-txt">Class 12, CBSE</span> <span class="c-dim">&middot; PSBB Sr. Sec. School, Chennai &middot; 95.2%</span>'
     ],
     publication:[
-      '<span class="c-acc">publication</span>',
+      '<span class="c-acc">publications</span> <span class="c-dim">&middot; two peer-reviewed journal papers</span>',
+      '',
+      '<span class="c-txt">&ldquo;Quantum-Resistant Microelectronic Cryptography for Securing Vehicular Networks&rdquo;</span>',
+      '<span class="c-dim">Russian Microelectronics, vol. 55 no. 1 &middot; Pleiades Publishing (Springer Nature) &middot; Scopus indexed &middot; 2026</span>',
+      LINKS.pub2,
       '',
       '<span class="c-txt">&ldquo;Improving Security in 5G Vehicular Networks Using ASCON and Machine Learning based NIDS&rdquo;</span>',
       '<span class="c-dim">Discover Internet of Things &middot; Springer Nature &middot; open access &middot; 2025</span>',
@@ -1059,6 +1097,7 @@ document.querySelectorAll('.filter').forEach(f=>{
       '&#8595;  <a href="Sai_Eshwar_Resume.pdf" download>Sai_Eshwar_Resume.pdf</a>'
     ]
   };
+  CMDS.publications=CMDS.publication;
 
   const TOPICS=[
     {k:['nourish','food','calorie','dish','swiggy','zomato','menu'],a:[
@@ -1104,6 +1143,16 @@ document.querySelectorAll('.filter').forEach(f=>{
       '<span class="c-acc">Crop Yield Predictor</span> <span class="c-dim">2023 &middot; ML</span>',
       '',
       'Random Forest over soil type, moisture, pH and crop history — <span class="c-txt">98% validation accuracy</span>, turned into actionable crop recommendations.']},
+    {k:['forage','simulation','job sim','legends of aether','aether','kpi','retention','churn','dau','metric'],a:[
+      '<span class="c-acc">Product Management Job Simulation</span> <span class="c-dim">Forage &middot; Sep 2026</span>',
+      '',
+      '<span class="c-txt">Task 1 &mdash; understanding product performance.</span> Picked one KPI per business question for <i>Legends of Aether</i>, a strategy RPG with rising downloads and falling engagement: 7-day <span class="c-txt">retention</span> over DAU for new-player stickiness (DAU mixes new players with veterans and hides the drop-off), <span class="c-txt">DAU</span> for community size, <span class="c-txt">churn</span> for players already lost, <span class="c-txt">conversion rate</span> over ARPU for campaign purchases.',
+      '<span class="c-txt">Task 2 &mdash; planning a stakeholder presentation.</span> A 7-step plan with owners, outputs, dependencies and named approval points, splitting one deck into three audiences: development gets where players drop off, marketing gets which segments the campaign brought in, leadership gets the business risk.']},
+    {k:['quantum','post-quantum','pleiades','russian microelectronics','lattice'],a:[
+      '<span class="c-acc">&ldquo;Quantum-Resistant Microelectronic Cryptography for Securing Vehicular Networks&rdquo;</span>',
+      '',
+      '<span class="c-dim">Russian Microelectronics, vol. 55 no. 1 &middot; Pleiades Publishing (Springer Nature) &middot; Scopus indexed &middot; 2026</span>',
+      LINKS.pub2]},
     {k:['everstage','comp','commission','superset','implementation','current job','work now'],a:CMDS.experience},
     {k:['why product','product manage','pm','why pm','transition'],a:[
       '<span class="c-acc">why product?</span>',
@@ -1113,7 +1162,7 @@ document.querySelectorAll('.filter').forEach(f=>{
     {k:['hire','why you','why should','stand out','different','impress'],a:[
       '<span class="c-acc">the pitch</span>',
       '',
-      '&#9657; <span class="c-txt">Proof over claims</span> — $500K+ ARR accounts owned end to end, 1,000+ payees per config, a $5M&rarr;$10M ARR ride, a Springer Nature paper, 10 shipped projects.',
+      '&#9657; <span class="c-txt">Proof over claims</span> — $500K+ ARR accounts owned end to end, 1,000+ payees per config, a $5M&rarr;$10M ARR ride, two peer-reviewed journal papers, 10 shipped projects.',
       '&#9657; <span class="c-txt">Builds what he specs</span> — the discovery instincts of a CX specialist plus the hands to ship the prototype the same week (this CLI included).',
       '&#9657; <span class="c-txt">Certified on both halves</span> — AWS AI/Cloud/ML Engineer on the tech side, CSM + Tech for PM on the process side.',
       '',
@@ -1122,12 +1171,12 @@ document.querySelectorAll('.filter').forEach(f=>{
       '<span class="c-acc">biggest impact</span>',
       '',
       'At Everstage: owning comp implementations for $500K+ ARR enterprise accounts touching 1,000+ payees each, while the company scaled $5M &rarr; $10M ARR.',
-      'On his own time: a peer-reviewed Springer Nature publication at 22, and a run of shipped AI products. Details: <span class="c-txt">/projects</span>.']},
+      'On his own time: two peer-reviewed journal publications (Springer Nature 2025, Russian Microelectronics 2026), and a run of shipped AI products. Details: <span class="c-txt">/projects</span>.']},
     {k:['where','based','location','city','chennai','singapore','relocate'],a:['Based in <span class="c-txt">Singapore</span>, originally from Chennai, India. Comfortable working with international stakeholders — he’s been the primary liaison for global enterprise clients at Everstage.']},
     {k:['email','contact','linkedin','reach','resume','cv'],a:CMDS.contact},
     {k:['cert','aws','scrum','csm','credly'],a:CMDS.certs},
     {k:['college','degree','cgpa','school','education','ssn','study','master','nus'],a:CMDS.education},
-    {k:['publication','paper','springer','journal','doi'],a:CMDS.publication},
+    {k:['publication','paper','springer','journal','doi','published','research paper'],a:CMDS.publication},
     {k:['volunteer','nss','invente','instincts','lead'],a:CMDS.leadership},
     {k:['project','shipped','built','portfolio'],a:CMDS.projects},
     {k:['who','about','yourself','intro'],a:CMDS.whoami},
