@@ -72,25 +72,14 @@ b { font-weight: 600; color: var(--sc-ink); }
 
 /* --------------------------------------------------------- split stage -- */
 .stage { background: var(--sc-canvas); }
-.field { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
-
-.seam {
-  position: absolute; top: 0; bottom: 0; width: 1px; z-index: 3;
-  left: calc(var(--d, 0.5) * 100%);
-  background: linear-gradient(to bottom, transparent, rgb(236 235 230 / 0.28) 14%, rgb(236 235 230 / 0.28) 86%, transparent);
-  pointer-events: none;
-}
-.seam__lbl {
-  position: absolute; top: calc(var(--bar-h) + 22px);
-  font: 500 11px/1 var(--sc-font-mono); letter-spacing: 0.14em; text-transform: uppercase;
-  white-space: nowrap;
-}
-.seam__lbl--fr { right: 14px; color: var(--sc-ink-soft); }
-.seam__lbl--sh { left: 14px; color: var(--sc-accent); }
+/* the scene layer: one illustration per beat, positioned by story.js */
+.scenes { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.scene { position: absolute; left: 0; top: 0; transform-origin: 50% 50%; display: none; opacity: 0; }
+.scene svg { display: block; width: 100%; height: 100%; overflow: visible; font-family: var(--sc-font-text); }
 
 .part { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 
-/* hero: a two-column grid whose middle is exactly the seam */
+/* hero: a two-column grid, recruiter facts on the right */
 .hero__grid {
   position: absolute; left: var(--sc-gutter); right: var(--sc-gutter); top: 52%; translate: 0 -50%;
   display: grid; grid-template-columns: 1fr 1fr; column-gap: calc(var(--sc-gutter) * 2); row-gap: 26px;
@@ -233,14 +222,6 @@ b { font-weight: 600; color: var(--sc-ink); }
   .bar__links { display: none; }
   .bar .kbd { display: none; }
   .bar__mark { font-size: 16px; }
-
-  .seam { top: calc(var(--d, 0.5) * 100%); bottom: auto; left: 0; right: 0; width: auto; height: 1px;
-    background: linear-gradient(to right, transparent, rgb(236 235 230 / 0.3) 10%, rgb(236 235 230 / 0.3) 90%, transparent); }
-  .seam__lbl { top: auto; }
-  .seam__lbl--fr { right: var(--sc-gutter); bottom: 8px; }
-  .seam__lbl--sh { left: auto; right: var(--sc-gutter); top: 8px; }
-  .seam__lbl { transition: opacity 200ms var(--sc-ease-out); }
-  .in-hero .seam__lbl { opacity: 0; }
 
   .hero__grid { top: calc(var(--bar-h) + 14px); translate: none; grid-template-columns: 1fr; grid-template-areas: "who" "h1" "sub" "offer"; row-gap: 12px; }
   .hero__h1 { display: block; font-size: clamp(2.05rem, 8.6vw, 2.7rem); line-height: 1; }

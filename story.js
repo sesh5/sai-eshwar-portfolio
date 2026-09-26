@@ -1,16 +1,15 @@
 /* ============================================================================
-   story.js: the split stage.
+   story.js: the stage.
 
    One pinned act holds the whole story: who Sai is, every project, the
-   papers, and when he can start. A seam divides the stage. The friction side
-   is the narrator, sceptical, with a field of dots drifting in no order. The
-   shipped side is Sai answering, on a clean ground. Scroll moves the seam, and
-   the seam sweeps the friction dots out of its way.
+   papers, and when he can start. In each beat the question appears on one
+   side and Sai's answer on the other, and the beat's illustration (scenes.js)
+   occupies whichever side is empty, gliding across as the text swaps sides.
 
    The timeline is read from the markup: every [data-part] in order, with its
-   data-kind (hero, qa, duo, quiet, peak) and data-len (viewport-heights of
-   travel). This file writes every cue window, mounts the scrollcraft engine
-   (unedited), then draws the field from the act's scroll position.
+   data-kind (hero, qa, duo, peak), data-len (viewport-heights of travel) and
+   data-scene. This file writes every cue window, mounts the scrollcraft
+   engine (unedited), and drives the scenes from a smoothed scroll position.
    ========================================================================== */
 (function () {
   'use strict';
@@ -21,17 +20,20 @@
   var act = document.getElementById('story');
   var bar = document.getElementById('bar');
   var stage = document.getElementById('stage');
-  var canvas = document.getElementById('field');
-  var ctx = canvas.getContext('2d');
+  var layer = document.getElementById('scenes');
 
   var clamp = function (x, a, b) { return x < a ? a : x > b ? b : x; };
   var smooth = function (x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+  var win = function (q, a, b) { return smooth((q - a) / (b - a)); };
   var lerp = function (a, b, t) { return a + (b - a) * t; };
 
   // ---- the timeline ---------------------------------------------------------
   var SEGS = [], T = 0;
   stage.querySelectorAll('[data-part]').forEach(function (el) {
-    var s = { el: el, id: el.getAttribute('data-part'), kind: el.getAttribute('data-kind'), len: parseFloat(el.getAttribute('data-len')) || 1 };
+    var s = {
+      el: el, id: el.getAttribute('data-part'), kind: el.getAttribute('data-kind'),
+      len: parseFloat(el.getAttribute('data-len')) || 1, scene: el.getAttribute('data-scene')
+    };
     s.s = T; T += s.len; s.e = T;
     SEGS.push(s);
   });
@@ -43,7 +45,7 @@
 
   // A cue window in travel units: in from a, full at `full`, leaving from
   // `fade`, gone at b. The engine takes fractions of the act.
-  function win(a, full, fade, b) {
+  function cwin(a, full, fade, b) {
     var w = Math.max(b - a, 0.001);
     return [a / T, b / T, (full - a) / w, (b - fade) / w].map(function (n) {
       return clamp(n, 0, 1).toFixed(4);
@@ -51,224 +53,159 @@
   }
   function cue(el, spec) { if (el) el.setAttribute('data-sc-cue', spec); }
 
+  // The illustration crosses between these two points of each question beat,
+  // after the question has gone and before the answer arrives.
+  var CROSS_A = 0.5, CROSS_B = 0.66;
+
   SEGS.forEach(function (s) {
     var L = s.len, fr = s.el.querySelector('[data-cue="fr"]'), sh = s.el.querySelector('[data-cue="sh"]');
-    // How long after this beat ends its shipped copy may linger: it must be
-    // gone before the next beat's seam crosses where it sits.
     var tail = s.next && s.next.kind === 'duo' ? 0.08 : 0.05;
     if (s.kind === 'hero') {
-      // Greet: fully present on the first frame. Never an empty stage.
-      cue(s.el.querySelector('[data-cue="hero"]'), win(0, 0, 0.6 * L, 0.94 * L));
+      // Greet: fully present on the first frame, never an empty stage.
+      cue(s.el.querySelector('[data-cue="hero"]'), cwin(0, 0, 0.55 * L, 0.97 * L));
     } else if (s.kind === 'qa') {
-      // Question first, then the answer as the seam sweeps across.
-      cue(fr, win(s.s + 0.03 * L, s.s + 0.15 * L, s.s + 0.47 * L, s.s + 0.57 * L));
-      cue(sh, win(s.s + 0.60 * L, s.s + 0.72 * L, s.e, s.e + tail));
+      cue(fr, cwin(s.s + 0.03 * L, s.s + 0.15 * L, s.s + 0.42 * L, s.s + 0.51 * L));
+      cue(sh, cwin(s.s + 0.64 * L, s.s + 0.75 * L, s.e, s.e + tail));
     } else if (s.kind === 'duo') {
-      // Both sides at once: the question with its controls, and the answer.
-      cue(fr, win(s.s + 0.06 * L, s.s + 0.2 * L, s.e - 0.06, s.e + 0.02));
-      cue(sh, win(s.s + 0.16 * L, s.s + 0.3 * L, s.e - 0.06, s.e + 0.02));
+      cue(fr, cwin(s.s + 0.04 * L, s.s + 0.16 * L, s.e - 0.06, s.e + 0.02));
+      cue(sh, cwin(s.s + 0.12 * L, s.s + 0.22 * L, s.e - 0.06, s.e + 0.02));
     } else if (s.kind === 'peak') {
       // The ask holds to the end of the act, fully lit at p = 1.
-      cue(s.el.querySelector('[data-cue="peak"]'), win(s.s + 0.42 * L, s.s + 0.56 * L, T, T));
+      cue(s.el.querySelector('[data-cue="peak"]'), cwin(s.s + 0.3 * L, s.s + 0.44 * L, T, T));
     }
   });
 
   var engine = ScrollCraft.mount(document.body);
 
-  // ---- the seam -------------------------------------------------------------
-  // D is where the seam sits, as a fraction of the stage: of its width on a
-  // desktop, of its height on a phone. Friction owns [0, D], shipped [D, 1].
-  // Every hold still creeps a little, so no stretch of scroll is dead.
-  var G = { DS: 0.68, DE: 0.36, DM: 0.5, Dh: 0.5, creep: 0.03 };
-  var phone = false;
+  // ---- scenes ---------------------------------------------------------------
+  var REG = window.SCENES.registry, el = window.SCENES.el;
+  var phone = false, W = 0, H = 0;
 
-  function seamEnd(s) {
-    if (!s) return G.Dh;
-    if (s.kind === 'hero') return G.Dh + G.creep;
-    if (s.kind === 'qa') return (s.endD || G.DE) - 0.02;
-    if (s.kind === 'duo') return G.DM - 0.012;
-    if (s.kind === 'quiet') return 1;
-    return 0;
-  }
-  function seamAt(u) {
-    var s = segAt(u), q = clamp((u - s.s) / s.len, 0, 1), from = seamEnd(s.prev);
-    if (s.kind === 'hero') return G.Dh + G.creep * smooth(q);
-    if (s.kind === 'qa') {
-      var DS = s.startD || G.DS, DE = s.endD || G.DE;
-      var hiD = DS + 0.02, loD = DS - 0.02;
-      if (q < 0.12) return lerp(from, hiD, smooth(q / 0.12));
-      if (q < 0.40) return lerp(hiD, loD, (q - 0.12) / 0.28);
-      if (q < 0.75) return lerp(loD, DE, smooth((q - 0.40) / 0.35));
-      return lerp(DE, DE - 0.02, (q - 0.75) / 0.25);
-    }
-    if (s.kind === 'duo') {
-      if (q < 0.15) return lerp(from, G.DM + 0.012, smooth(q / 0.15));
-      return lerp(G.DM + 0.012, G.DM - 0.012, (q - 0.15) / 0.85);
-    }
-    if (s.kind === 'quiet') return q < 0.6 ? lerp(from, 1, smooth(q / 0.6)) : 1;
-    return q < 0.55 ? lerp(1, 0, smooth(q / 0.55)) : 0;
+  SEGS.forEach(function (s) {
+    if (!s.scene || !REG[s.scene]) return;
+    var def = REG[s.scene];
+    var wrap = document.createElement('div');
+    wrap.className = 'scene' + (def.wide ? ' scene--wide' : '');
+    wrap.setAttribute('data-for', s.id);
+    layer.appendChild(wrap);
+    // Each beat gets its own instance, so its state is its own.
+    s.sc = Object.create(def);
+    s.wrap = wrap;
+  });
+
+  function buildScenes() {
+    SEGS.forEach(function (s) {
+      if (!s.sc) return;
+      if (s.built === phone) return;
+      s.wrap.innerHTML = '';
+      var svg = el('svg', { viewBox: '0 0 400 300', preserveAspectRatio: 'xMidYMid meet', role: 'presentation' }, s.wrap);
+      var g = el('g', {}, svg);
+      s.sc.build(g, phone);
+      if (s.sc.vb) svg.setAttribute('viewBox', s.sc.vb.join(' '));
+      s.built = phone;
+      s.sc.update(reduce ? 1 : 0, 0);
+    });
   }
 
-  // ---- friction: dots in a flow field, confined to their side --------------
-  var N = 1300;
-  var px = new Float32Array(N), py = new Float32Array(N);
-  var cx = new Float32Array(N), cy = new Float32Array(N);
-  var al = new Float32Array(N), seedR = new Float32Array(N);
-  for (var i = 0; i < N; i++) seedR[i] = Math.random();
+  function rel(e) { return { top: e.offsetTop, bottom: e.offsetTop + e.offsetHeight }; }
 
-  var W = 0, H = 0, dpr = 1, U = 0, Dcur = 0.5, t0 = performance.now(), started = false;
-
-  function rel(el) { return { top: el.offsetTop, bottom: el.offsetTop + el.offsetHeight }; }
-
+  // Where each scene sits: side A while the question is up, side B while the
+  // answer is up. On a desktop the sides are left and right; on a phone,
+  // below the question and above the answer.
   function layout() {
     phone = phoneMQ.matches;
     W = stage.clientWidth; H = stage.clientHeight;
-    dpr = Math.min(devicePixelRatio || 1, 2);
-    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
-    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-    stage.classList.toggle('is-phone', phone);
+    buildScenes();
+    var g = Math.max(20, Math.min(W * 0.05, 88)), barH = phone ? 54 : 58;
 
-    G.DS = phone ? 0.64 : 0.68;
-    G.DE = phone ? 0.40 : 0.36;
-    G.DM = 0.5;
-    G.creep = phone ? 0.012 : 0.03;
-    if (phone) {
-      // The hero's seam runs between the two halves of the headline.
-      var a = stage.querySelector('.hero__a').getBoundingClientRect();
-      var b = stage.querySelector('.hero__b').getBoundingClientRect();
-      var st = stage.getBoundingClientRect();
-      G.Dh = clamp(((a.bottom + b.top) / 2 - st.top) / H, 0.2, 0.8);
-      // A duo beat splits just under its question block.
-      var lensEl = seg('lens').el, fr = rel(lensEl.querySelector('.fr'));
-      G.DM = clamp((fr.bottom + 22) / H, 0.4, 0.62);
-      // and its answer sits right under the seam, not at the foot of the screen
-      var lsh = lensEl.querySelector('.sh');
-      lsh.style.top = Math.round(G.DM * H + 26) + 'px'; lsh.style.bottom = 'auto';
-    } else {
-      G.Dh = 0.5;
-      var lsh2 = seg('lens').el.querySelector('.sh');
-      lsh2.style.top = ''; lsh2.style.bottom = '';
-    }
-
-    // On a phone each beat sizes its own seam: the answer sits just under it,
-    // and the question always fits above where it starts.
     SEGS.forEach(function (s) {
-      s.startD = s.endD = 0;
-      if (s.kind !== 'qa' || !phone) return;
-      var fr = rel(s.el.querySelector('.fr')), sh = rel(s.el.querySelector('.sh'));
-      s.endD = clamp((sh.top - 30) / H, 0.16, 0.46);
-      s.startD = clamp(Math.max(G.DS, (fr.bottom + 28) / H), s.endD + 0.12, 0.8);
-    });
-
-    if (!started) {
-      // Pour every dot out of the seam on first paint.
-      for (var i = 0; i < N; i++) {
-        var along = seedR[i] * (phone ? W : H);
-        if (phone) { px[i] = along; py[i] = H * G.Dh; } else { px[i] = W * G.Dh; py[i] = along; }
-        respawn(i, true);
-        if (reduce) { px[i] = cx[i]; py[i] = cy[i]; }
+      if (!s.sc) return;
+      var b;
+      if (s.kind === 'peak') {
+        var copy = rel(s.el.querySelector('.peak__copy'));
+        var top = copy.bottom + (phone ? 26 : 40), bw = Math.min(W - 2 * g, 980), bh = Math.max(80, H - top - (phone ? 24 : 48));
+        var vb = s.sc.vb, asp = vb[2] / vb[3];
+        if (bw / bh > asp) bw = bh * asp; else bh = bw / asp;
+        b = { w: bw, h: bh, A: [phone ? (W - bw) / 2 : g, top], B: null };
+      } else if (!phone) {
+        var bw2 = Math.min(W * 0.46, 680), bh2 = bw2 * 0.75;
+        if (bh2 > H * 0.7) { bh2 = H * 0.7; bw2 = bh2 / 0.75; }
+        var y = H * 0.52 - bh2 / 2;
+        b = { w: bw2, h: bh2, A: [W * 0.745 - bw2 / 2, y], B: [W * 0.262 - bw2 / 2, y] };
+      } else {
+        var fr = rel(s.el.querySelector('.fr')), sh = rel(s.el.querySelector('.sh'));
+        var aTop = fr.bottom + 12, aBot = H - 14, bTop = barH + 8, bBot = sh.top - 12;
+        var bw3 = W - 2 * g, bh3 = Math.min(bw3 * 0.75, aBot - aTop, bBot - bTop);
+        bw3 = Math.min(bw3, bh3 / 0.75);
+        b = { w: bw3, h: bh3, A: [(W - bw3) / 2, (aTop + aBot) / 2 - bh3 / 2], B: [(W - bw3) / 2, (bTop + bBot) / 2 - bh3 / 2] };
       }
-      started = true;
-    }
-    draw();
-  }
-
-  function respawn(i, keep) {
-    var Dpx = (phone ? H : W) * Dcur;
-    var lo = phone ? 64 : 10, hi = Math.max(lo + 2, Dpx - 10);
-    var a = lo + Math.random() * (hi - lo), o = Math.random() * (phone ? W : H);
-    if (phone) { cx[i] = o; cy[i] = a; } else { cx[i] = a; cy[i] = o; }
-    if (!keep) { px[i] = cx[i]; py[i] = cy[i]; al[i] = 0; }
-  }
-
-  function flow(x, y, t) {
-    return Math.sin(x * 0.0061 + t * 0.37) * 2.1 + Math.cos(y * 0.0073 - t * 0.29) * 1.7 + Math.sin((x - y) * 0.0042 + t * 0.21) * 1.3;
+      s.box = b;
+      s.wrap.style.width = b.w.toFixed(1) + 'px';
+      s.wrap.style.height = b.h.toFixed(1) + 'px';
+    });
+    render(true);
   }
 
   // ---- scroll ---------------------------------------------------------------
-  function read() {
+  var U = 0, Us = 0, t0 = performance.now();
+  var heroLayers = [['.hero__who', 14], ['.hero__a', 30], ['.hero__b', 44], ['.hero__sub', 20], ['.hero__offer', 58]].map(function (x) {
+    return { el: stage.querySelector(x[0]), r: x[1] };
+  });
+
+  function readU() {
     var r = act.getBoundingClientRect();
     var travel = Math.max(act.offsetHeight - innerHeight, 1);
     U = clamp(-r.top / travel, 0, 1) * T;
-    var s = segAt(U), D = seamAt(U), q = (U - s.s) / s.len;
-    stage.classList.toggle('in-hero', s.kind === 'hero');
     bar.classList.toggle('bar--solid', r.bottom < 70);
-    // Tell the verification harness what the stage is actually showing.
-    stage.setAttribute('data-sc-verify-state', s.id + ':' + D.toFixed(2));
-    // Authored holds: the resolved ask, and the role switch, where the page
-    // waits for a click rather than a scroll.
-    if ((s.kind === 'peak' && q > 0.54) || (s.kind === 'duo' && q > 0.3 && q < 0.95)) stage.setAttribute('data-sc-verify-hold', 'true');
-    else stage.removeAttribute('data-sc-verify-hold');
-    return D;
+    return r;
   }
 
-  var rects = [];
-  function quietRects() {
-    // Dots dim wherever copy is on screen, so type always sits on a quiet patch.
-    rects.length = 0;
-    var els = stage.querySelectorAll('[data-sc-cue]');
-    var st = stage.getBoundingClientRect();
-    for (var k = 0; k < els.length; k++) {
-      var o = parseFloat(els[k].style.opacity || '0');
-      if (o < 0.04) continue;
-      var r = els[k].getBoundingClientRect();
-      rects.push([r.left - st.left - 18, r.top - st.top - 14, r.right - st.left + 18, r.bottom - st.top + 14]);
-    }
-    rects.push([0, 0, W, 60]);
-  }
-  function quiet(x, y) {
-    for (var k = 0; k < rects.length; k++) {
-      var r = rects[k];
-      if (x > r[0] && x < r[2] && y > r[1] && y < r[3]) return k === rects.length - 1 ? 0.35 : 0.12;
-    }
-    return 1;
-  }
+  function render(snap) {
+    readU();
+    // A smoothed playhead, so a notched wheel still reads as one glide.
+    Us = snap || reduce ? U : Us + (U - Us) * 0.16;
+    if (Math.abs(U - Us) < 0.0004) Us = U;
+    var t = reduce ? 0 : (performance.now() - t0) / 1000;
+    var cur = segAt(Us), sig = cur.id;
 
-  var FR_GROUND = '#0a0b0d', SH_GROUND = '#0b110e';
-
-  function draw() {
-    var t = (performance.now() - t0) / 1000;
-    var Dt = read();
-    Dcur = reduce ? Dt : lerp(Dcur, Dt, 0.22);
-    stage.style.setProperty('--d', Dcur.toFixed(4));
-    var size = phone ? H : W, Dpx = size * Dcur;
-    quietRects();
-
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = FR_GROUND;
-    ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = SH_GROUND;
-    if (phone) ctx.fillRect(0, Dpx, W, H - Dpx); else ctx.fillRect(Dpx, 0, W - Dpx, H);
-
-    var spd = phone ? 0.5 : 0.7, lo = phone ? 64 : 10, hi = Dpx - 10, room = hi > lo + 4;
-    var z = phone ? 1.6 : 1.9;
-    ctx.fillStyle = '#8f8f88';
-    for (var i = 0; i < N; i++) {
-      if (!reduce) {
-        var ang = flow(cx[i], cy[i], t) * 1.1 + seedR[i] * 0.6;
-        cx[i] += Math.cos(ang) * spd; cy[i] += Math.sin(ang) * spd;
+    SEGS.forEach(function (s) {
+      if (!s.sc || !s.box) return;
+      var q = (Us - s.s) / s.len;
+      var near = q > -0.15 && q < 1.15;
+      if (!near) { if (s.shown !== false) { s.wrap.style.opacity = '0'; s.wrap.style.display = 'none'; s.shown = false; } return; }
+      var qc = clamp(q, 0, 1), alpha, x, y, sc = 1;
+      if (s.kind === 'peak') {
+        alpha = win(q, 0.2, 0.34);
+        x = s.box.A[0]; y = s.box.A[1] + (1 - alpha) * 16;
+      } else {
+        alpha = Math.min(win(q, -0.02, 0.08), 1 - win(q, 0.95, 1.05));
+        var m = reduce ? (q < 0.58 ? 0 : 1) : win(q, CROSS_A, CROSS_B);
+        x = lerp(s.box.A[0], s.box.B[0], m); y = lerp(s.box.A[1], s.box.B[1], m);
+        sc = 1 - 0.07 * Math.sin(Math.PI * m);
+        if (reduce) alpha *= 1 - 0.85 * Math.sin(Math.PI * clamp((q - 0.53) / 0.1, 0, 1));
       }
-      var a = phone ? cy[i] : cx[i], o = phone ? cx[i] : cy[i], lim = phone ? W : H;
-      // Out of bounds: nudge back, and now and then lift the dot out and drop
-      // it somewhere fresh, so friction never packs into a wall at the seam.
-      var out = false;
-      if (room) {
-        if (a > hi) { a -= (a - hi) * 0.3 + 0.8; out = a > hi + 24 || Math.random() < 0.06; }
-        if (a < lo) { a = lo + (lo - a) * 0.5 + 0.5; out = out || Math.random() < 0.06; }
-      }
-      if (phone) cy[i] = a; else cx[i] = a;
-      if (room && (out || o < 2 || o > lim - 2)) respawn(i, false);
-      var k = reduce ? 1 : 0.16;
-      px[i] += (cx[i] - px[i]) * k; py[i] += (cy[i] - py[i]) * k;
-      var want = room ? 0.6 : 0;
-      al[i] = reduce ? want : al[i] + (want - al[i]) * 0.14;
-      var alpha = al[i] * quiet(px[i], py[i]);
-      if (alpha < 0.01) continue;
-      ctx.globalAlpha = alpha;
-      ctx.fillRect(px[i] - z / 2, py[i] - z / 2, z, z);
+      if (!s.shown) { s.wrap.style.display = 'block'; s.shown = true; }
+      s.wrap.style.opacity = alpha.toFixed(3);
+      s.wrap.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) scale(' + sc.toFixed(4) + ')';
+      // Under reduced motion each scene shows its resolved state.
+      s.sc.update(reduce ? 1 : qc, t);
+      if (s === cur) sig = s.id + ':' + qc.toFixed(2);
+    });
+
+    // The hero's layers drift apart at different rates as the page starts to
+    // move: depth from differential motion, and never a dead first scroll.
+    if (!reduce) {
+      var hq = clamp(Us / seg('hero').len, 0, 1.2);
+      var damp = phone ? 0.35 : 1;
+      heroLayers.forEach(function (h) { h.el.style.transform = 'translate3d(0,' + (-hq * h.r * damp).toFixed(2) + 'px,0)'; });
+      if (cur.kind === 'hero') sig = 'hero:' + hq.toFixed(2);
     }
-    ctx.globalAlpha = 1;
+
+    // Tell the verification harness what is actually painted.
+    stage.setAttribute('data-sc-verify-state', sig);
+    var cq = (Us - cur.s) / cur.len;
+    var hold = reduce || (cur.kind === 'peak' && cq > 0.9) || (cur.kind === 'duo' && cq > 0.22 && cq < 0.95);
+    if (hold) stage.setAttribute('data-sc-verify-hold', 'true'); else stage.removeAttribute('data-sc-verify-hold');
   }
 
   // ---- loop: only while the stage can be seen ------------------------------
@@ -279,14 +216,14 @@
   }
   function loop() {
     if (!visible()) { running = false; return; }
-    draw();
+    render(false);
     requestAnimationFrame(loop);
   }
   function kick() {
-    if (reduce) { draw(); return; }
+    if (reduce) { render(true); return; }
     if (!running && visible()) { running = true; requestAnimationFrame(loop); }
   }
-  addEventListener('scroll', function () { if (!running) read(); kick(); }, { passive: true });
+  addEventListener('scroll', function () { if (!running) readU(); kick(); }, { passive: true });
   document.addEventListener('visibilitychange', kick);
 
   var lastW = 0;
@@ -313,7 +250,7 @@
     document.querySelectorAll('.lens__b').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lens') === key)); });
     document.querySelectorAll('.lens__text [data-for]').forEach(function (p) { p.hidden = p.getAttribute('data-for') !== key; });
     // A role is marked elsewhere only once the visitor has actually chosen it.
-    document.querySelectorAll('[data-role]').forEach(function (el) { el.classList.toggle('is-picked', !!mark && el.getAttribute('data-role') === key); });
+    document.querySelectorAll('[data-role]').forEach(function (e) { e.classList.toggle('is-picked', !!mark && e.getAttribute('data-role') === key); });
     var subject = encodeURIComponent('Internship enquiry: ' + ROLE[key] + ' (Dec 2026 to Dec 2027)');
     document.querySelectorAll('[data-mail]').forEach(function (a) { a.href = 'mailto:seshwarsai@gmail.com?subject=' + subject; });
     if (remember) { try { localStorage.setItem('sai-lens', key); } catch (e) {} }
@@ -331,7 +268,7 @@
     return top + (u / T) * (act.offsetHeight - innerHeight);
   }
   function at(id, q) { var s = seg(id); return s.s + q * s.len; }
-  var GOTO = { hero: 0, about: at('about', 0.2), work: at('w1', 0.2), pubs: at('pubs', 0.2), peak: at('peak', 0.8) };
+  var GOTO = { hero: 0, about: at('about', 0.2), work: at('w1', 0.2), pubs: at('pubs', 0.2), peak: at('peak', 0.95) };
   document.querySelectorAll('[data-goto]').forEach(function (a) {
     a.addEventListener('click', function (e) {
       var u = GOTO[a.getAttribute('data-goto')];
@@ -344,7 +281,7 @@
   // Keyboard focus inside the pinned stage. The engine centres a focused
   // control, which on a sticky stage scrolls back out of the act and parks
   // every cue at 0. Park the act where that control's own copy is lit.
-  var PARK = { hero: 0, lens: at('lens', 0.6), pubs: at('pubs', 0.88), peak: GOTO.peak };
+  var PARK = { hero: 0, lens: at('lens', 0.6), pubs: at('pubs', 0.9), peak: GOTO.peak };
   addEventListener('focusin', function (e) {
     var part = e.target && e.target.closest && e.target.closest('#story [data-part]');
     if (!part) return;

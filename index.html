@@ -37,22 +37,18 @@
 
 <main id="top">
 
-  <!-- THE SPLIT STAGE. One pinned act, one moving seam.
-       The friction side is the narrator: sceptical, a little rude.
-       The shipped side is Sai, answering. story.js reads every [data-part] in
-       order, builds the timeline from data-kind and data-len, writes the cue
-       windows, then mounts the engine. -->
+  <!-- THE STAGE. One pinned act. The question (the narrator: sceptical, a
+       little rude) sits on one side and Sai's answer on the other, while each
+       beat's illustration glides across the empty side. story.js reads every
+       [data-part] in order, builds the timeline, writes the cue windows, and
+       mounts the engine. -->
   <section id="story" data-sc-act="pin" data-sc-span="18" aria-label="About, projects and publications">
     <div data-sc-stage class="stage" id="stage">
-      <canvas class="field" id="field" aria-hidden="true"></canvas>
-
-      <div class="seam" aria-hidden="true">
-        <span class="seam__lbl seam__lbl--fr">Friction</span>
-        <span class="seam__lbl seam__lbl--sh">Shipped</span>
-      </div>
+      <!-- one illustrated, scroll-driven scene per beat, built by scenes.js -->
+      <div class="scenes" id="scenes" aria-hidden="true"></div>
 
       <!-- HERO: the recruiter's screen, complete on the first frame. -->
-      <div class="part hero" data-part="hero" data-kind="hero" data-len="0.7">
+      <div class="part hero" data-part="hero" data-kind="hero" data-len="0.75">
         <div class="hero__grid" data-cue="hero">
           <p class="hero__who">Sai Eshwar <span>&middot; MSc, National University of Singapore</span></p>
           <h1 class="hero__h1"><span class="hero__a">I turn user friction</span> <span class="hero__b">into shipped product.</span></h1>
@@ -71,7 +67,7 @@
       </div>
 
       <!-- ABOUT, part one: who is this guy -->
-      <article class="part" data-part="about" data-kind="qa" data-len="1.25">
+      <article class="part" data-part="about" data-scene="route" data-kind="qa" data-len="1.25">
         <div class="fr" data-cue="fr">
           <p class="kick">About</p>
           <h2>So. Who is this guy?</h2>
@@ -112,7 +108,7 @@
 
       <!-- PROJECTS: one per scroll step. The narrator states the problem,
            Sai states the fix. Every figure is from the original case studies. -->
-      <article class="part" data-part="w1" data-kind="qa" data-len="0.95">
+      <article class="part" data-part="w1" data-scene="nourish" data-kind="qa" data-len="0.95">
         <div class="fr" data-cue="fr">
           <p class="kick"><span>Project 1 of 11</span> NourishAI &middot; 2026 &middot; AI product</p>
           <h2>Try asking a food app for &ldquo;high-protein, under 500 calories, not fried.&rdquo;</h2>
@@ -124,7 +120,7 @@
         </div>
       </article>
 
-      <article class="part" data-part="w2" data-kind="qa" data-len="0.95">
+      <article class="part" data-part="w2" data-scene="arena" data-kind="qa" data-len="0.95">
         <div class="fr" data-cue="fr">
           <p class="kick"><span>Project 2 of 11</span> Content Arena (formerly RivalRadar) &middot; 2025 &middot; AI product</p>
           <h2>&ldquo;Who is my competition?&rdquo; Every YouTuber asks. Subscriber counts do not answer.</h2>
@@ -136,7 +132,7 @@
         </div>
       </article>
 
-      <article class="part" data-part="w3" data-kind="qa" data-len="0.95">
+      <article class="part" data-part="w3" data-scene="sheet" data-kind="qa" data-len="0.95">
         <div class="fr" data-cue="fr">
           <p class="kick"><span>Project 3 of 11</span> Decoding the 2026 Tamil Nadu Election &middot; Data analysis</p>
           <h2>8,000+ rows of election data, two cycles, and names that refused to match.</h2>
@@ -148,7 +144,7 @@
         </div>
       </article>
 
-      <article class="part" data-part="w4" data-kind="qa" data-len="0.95">
+      <article class="part" data-part="w4" data-scene="retention" data-kind="qa" data-len="0.95">
         <div class="fr" data-cue="fr">
           <p class="kick"><span>Project 4 of 11</span> Forage PM Job Simulation &middot; 2026 &middot; Product management</p>
           <h2>Downloads up. Players leaving. Three teams, three opinions, zero agreement.</h2>
@@ -160,7 +156,7 @@
         </div>
       </article>
 
-      <article class="part" data-part="w5" data-kind="qa" data-len="0.95">
+      <article class="part" data-part="w5" data-scene="voice" data-kind="qa" data-len="0.95">
         <div class="fr" data-cue="fr">
           <p class="kick"><span>Project 5 of 11</span> AI Voice Agent for L1 Support &middot; 2025</p>
           <h2>Support agents answering the same question for the hundredth time today.</h2>
@@ -172,7 +168,7 @@
         </div>
       </article>
 
-      <article class="part" data-part="w6" data-kind="qa" data-len="0.95">
+      <article class="part" data-part="w6" data-scene="pipe" data-kind="qa" data-len="0.95">
         <div class="fr" data-cue="fr">
           <p class="kick"><span>Project 6 of 11</span> Fathom &times; Freshdesk Automation &middot; 2025</p>
           <h2>After every call: copy the summary, paste it into the ticket, repeat forever.</h2>
@@ -184,7 +180,7 @@
         </div>
       </article>
 
-      <article class="part" data-part="w7" data-kind="qa" data-len="0.95">
+      <article class="part" data-part="w7" data-scene="iov" data-kind="qa" data-len="0.95">
         <div class="fr" data-cue="fr">
           <p class="kick"><span>Project 7 of 11</span> IoV Security with ASCON &middot; 2023 to 2024 &middot; Research</p>
           <h2>Cars on 5G share safety-critical data on hardware too small for heavy encryption.</h2>
@@ -196,7 +192,7 @@
         </div>
       </article>
 
-      <article class="part" data-part="w8" data-kind="qa" data-len="0.95">
+      <article class="part" data-part="w8" data-scene="crop" data-kind="qa" data-len="0.95">
         <div class="fr" data-cue="fr">
           <p class="kick"><span>Project 8 of 11</span> Crop Yield Predictor &middot; 2023 &middot; Machine learning</p>
           <h2>Crops chosen by tradition, while the soil holds the actual answer.</h2>
@@ -208,7 +204,7 @@
         </div>
       </article>
 
-      <article class="part" data-part="w9" data-kind="qa" data-len="0.95">
+      <article class="part" data-part="w9" data-scene="granary" data-kind="qa" data-len="0.95">
         <div class="fr" data-cue="fr">
           <p class="kick"><span>Project 9 of 11</span> Smart Granary System &middot; 2024 &middot; IoT</p>
           <h2>Stored grain spoils quietly, and nobody can watch a granary all night.</h2>
@@ -220,7 +216,7 @@
         </div>
       </article>
 
-      <article class="part" data-part="w10" data-kind="qa" data-len="0.95">
+      <article class="part" data-part="w10" data-scene="posture" data-kind="qa" data-len="0.95">
         <div class="fr" data-cue="fr">
           <p class="kick"><span>Project 10 of 11</span> Posture Correcting Device &middot; 2024 &middot; Hardware</p>
           <h2>You are probably slouching right now.</h2>
@@ -232,7 +228,7 @@
         </div>
       </article>
 
-      <article class="part" data-part="w11" data-kind="qa" data-len="0.95">
+      <article class="part" data-part="w11" data-scene="d2d" data-kind="qa" data-len="0.95">
         <div class="fr" data-cue="fr">
           <p class="kick"><span>Project 11 of 11</span> Federated Learning for D2D Networks &middot; 2023 &middot; Research internship</p>
           <h2>Devices that must decide how to talk to each other, with nobody in charge.</h2>
@@ -245,7 +241,7 @@
       </article>
 
       <!-- PUBLICATIONS -->
-      <article class="part" data-part="pubs" data-kind="qa" data-len="1.4">
+      <article class="part" data-part="pubs" data-scene="papers" data-kind="qa" data-len="1.4">
         <div class="fr" data-cue="fr">
           <p class="kick">Publications</p>
           <h2>Right. Publications. What has this guy actually published?</h2>
@@ -267,11 +263,8 @@
         </div>
       </article>
 
-      <!-- authored silence: the seam floods back to friction, no copy -->
-      <div class="part" data-part="quiet" data-kind="quiet" data-len="0.35" aria-hidden="true"></div>
-
-      <!-- THE PEAK: the seam sweeps the whole width and friction is gone. -->
-      <div class="part peak" data-part="peak" data-kind="peak" data-len="1.5">
+      <!-- THE PEAK: every month of availability lights up. -->
+      <div class="part peak" data-part="peak" data-scene="months" data-kind="peak" data-len="1.5">
         <div class="peak__copy" data-cue="peak">
           <p class="kick">All of that, available</p>
           <h2>Open to internships from December 2026 to December 2027.</h2>
@@ -397,6 +390,7 @@
 </div>
 
 <script src="scrollcraft.js"></script>
+<script src="scenes.js"></script>
 <script src="story.js"></script>
 <script src="cli.js"></script>
 </body>
