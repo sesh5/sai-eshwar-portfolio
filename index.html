@@ -19,14 +19,15 @@
 </head>
 <body>
 
-<a class="skip" href="#more">Skip to the full project list</a>
+<a class="skip" href="#experience">Skip the story: go to experience and credentials</a>
 
 <header class="bar" id="bar">
   <a class="bar__mark" href="#top" data-goto="hero">Sai Eshwar</a>
   <nav class="bar__links" aria-label="Sections">
-    <a href="#story" data-goto="p1">Work</a>
+    <a href="#story" data-goto="about">About</a>
+    <a href="#story" data-goto="work">Projects</a>
+    <a href="#story" data-goto="pubs">Publications</a>
     <a href="#experience">Experience</a>
-    <a href="#credentials">Credentials</a>
   </nav>
   <div class="bar__acts">
     <button type="button" class="btn btn--ghost btn--sm" data-cli aria-label="Ask sai.cli, the portfolio terminal">Ask <span class="kbd" aria-hidden="true">&#8984;K</span></button>
@@ -36,10 +37,12 @@
 
 <main id="top">
 
-  <!-- THE SPLIT STAGE. One pinned act. Friction on one side, shipped on the
-       other, and scroll moves the seam. story.js builds the timeline, writes
-       every cue window, then mounts the engine. -->
-  <section id="story" data-sc-act="pin" data-sc-span="9.5" aria-label="Featured work">
+  <!-- THE SPLIT STAGE. One pinned act, one moving seam.
+       The friction side is the narrator: sceptical, a little rude.
+       The shipped side is Sai, answering. story.js reads every [data-part] in
+       order, builds the timeline from data-kind and data-len, writes the cue
+       windows, then mounts the engine. -->
+  <section id="story" data-sc-act="pin" data-sc-span="18" aria-label="About, projects and publications">
     <div data-sc-stage class="stage" id="stage">
       <canvas class="field" id="field" aria-hidden="true"></canvas>
 
@@ -48,19 +51,18 @@
         <span class="seam__lbl seam__lbl--sh">Shipped</span>
       </div>
 
-      <!-- HERO: the recruiter's screen. Everything a recruiter needs is here,
-           on the first frame, with nothing behind a scroll. -->
-      <div class="part hero" data-part="hero">
+      <!-- HERO: the recruiter's screen, complete on the first frame. -->
+      <div class="part hero" data-part="hero" data-kind="hero" data-len="0.7">
         <div class="hero__grid" data-cue="hero">
           <p class="hero__who">Sai Eshwar <span>&middot; MSc, National University of Singapore</span></p>
           <h1 class="hero__h1"><span class="hero__a">I turn user friction</span> <span class="hero__b">into shipped product.</span></h1>
           <p class="hero__sub">Two years owning enterprise SaaS implementations at Everstage. Now at NUS, building AI tools on the side.</p>
           <div class="hero__offer">
             <p class="avail"><span class="dot" aria-hidden="true"></span>Open to credit-bearing internships, December 2026 to December 2027</p>
-            <p class="roles"><span>Product Management</span> <i>/</i> <span>Data Analyst</span> <i>/</i> <span>Business Analyst</span></p>
+            <p class="roles"><span data-role="pm">Product Management</span> <i>/</i> <span data-role="da">Data Analyst</span> <i>/</i> <span data-role="ba">Business Analyst</span></p>
             <div class="acts">
               <a class="btn btn--accent" href="Sai_Eshwar_Resume.pdf" download>Download CV</a>
-              <a class="btn btn--ghost" href="mailto:seshwarsai@gmail.com">Email me</a>
+              <a class="btn btn--ghost" href="mailto:seshwarsai@gmail.com" data-mail>Email me</a>
               <a class="btn btn--ghost" href="https://linkedin.com/in/sai-eshwar-s-b529931bb" target="_blank" rel="noopener">LinkedIn</a>
             </div>
             <p class="proof">$500K+ ARR accounts owned end to end &middot; 1,000+ payees per client configuration &middot; 2 peer-reviewed papers &middot; 3 AWS certifications</p>
@@ -68,154 +70,219 @@
         </div>
       </div>
 
-      <!-- FEATURED: each project is a problem on the left and what got built
-           on the right. The dots on the shipped side are the real figures. -->
-      <article class="part" data-part="p1" data-form="payees">
+      <!-- ABOUT, part one: who is this guy -->
+      <article class="part" data-part="about" data-kind="qa" data-len="1.25">
         <div class="fr" data-cue="fr">
-          <p class="kick">Everstage &middot; 2024 to 2026 &middot; Business analysis, implementation</p>
-          <h2>Commission plans for 1,000+ payees, where one wrong rule means a wrong payout.</h2>
-          <p>Enterprise sales teams live on these plans. The logic gaps hide in Salesforce, HubSpot and Stripe data until a payee finds them first.</p>
+          <p class="kick">About</p>
+          <h2>So. Who is this guy?</h2>
+          <p>Short version: a person who cannot leave a broken process alone. He asks the one follow-up question too many, then quietly builds the thing that makes the question unnecessary.</p>
         </div>
-        <div class="sh" data-cue="sh">
-          <p>I owned implementations end to end for <b>$500K+ ARR</b> clients, mined the CRM data with SQL and Python to find the logic gaps before payees did, and built Superset dashboards for MRR, CAC and quota attainment while Everstage grew from <b>$5M to $10M ARR</b>.</p>
-          <p class="cap">Each dot is one payee. The configurations I owned each touched 1,000 or more of them.</p>
+        <div class="sh sh--about" data-cue="sh">
+          <p>I'm Sai. For two years at Everstage, a sales-commission SaaS company, I owned enterprise implementations end to end: <b>$500K+ ARR</b> clients, configurations touching <b>1,000+ payees</b> each, while the company grew from $5M to $10M ARR. That job taught me the real skill in product: sitting with users until the actual problem shows up underneath the one they first described.</p>
+          <dl class="facts">
+            <dt>Now</dt><dd>MSc, Management of Technology and Innovation, NUS, Singapore</dd>
+            <dt>Before</dt><dd>Everstage (2024 to 2026) &middot; research intern, University of Cyprus (2023)</dd>
+            <dt>Receipts</dt><dd>2 peer-reviewed papers &middot; 3 AWS certifications &middot; Certified ScrumMaster</dd>
+            <dt>After hours</dt><dd>Building AI tools, including the terminal behind the Ask button</dd>
+          </dl>
         </div>
       </article>
 
-      <article class="part" data-part="p2" data-form="retention">
+      <!-- ABOUT, part two: the interactive bit. Pick the role, get the case. -->
+      <article class="part" data-part="lens" data-kind="duo" data-len="1.15">
         <div class="fr" data-cue="fr">
-          <p class="kick">Forage PM Job Simulation &middot; 2026 &middot; Product management</p>
-          <h2>Downloads were rising, and three teams could not agree on what the numbers meant.</h2>
-          <p>A strategy RPG, <i>Legends of Aether</i>, was growing installs and losing players. Everyone was reading a different metric.</p>
+          <p class="kick">About, continued</p>
+          <h2>Fine. But is he right for <em>your</em> role?</h2>
+          <p>Pick what you are hiring for. He will make his case in one paragraph, and your email to him will already have the right subject line.</p>
+          <div class="lens" role="group" aria-label="What are you hiring for?">
+            <button type="button" class="lens__b" data-lens="pm" aria-pressed="true">Product Management</button>
+            <button type="button" class="lens__b" data-lens="da" aria-pressed="false">Data Analyst</button>
+            <button type="button" class="lens__b" data-lens="ba" aria-pressed="false">Business Analyst</button>
+          </div>
         </div>
         <div class="sh" data-cue="sh">
-          <p>I picked one KPI per question and argued why the near miss was wrong: <b>7-day retention over DAU</b>, because DAU mixes veterans in with new players and hides the drop-off. Then a 7-step plan that split one deck into three audiences: development, marketing and leadership.</p>
-          <p class="cap">One dot per 100 installs. 10,000 installed, 3,000 came back on day 7: 30% retention. The worked example from my brief.</p>
+          <div class="lens__text" aria-live="polite">
+            <p data-for="pm">I have done PM work without the title. At Everstage I sat between customers, engineering and product, turning <i>&ldquo;this commission is wrong&rdquo;</i> into requirements someone could build. On my own I run the whole loop: I scoped NourishAI, built it, and already know what ships next. Certified ScrumMaster, HelloPM Tech for PM, and a Forage PM simulation where I argued 7-day retention over DAU.</p>
+            <p data-for="da" hidden>I have been the data person without ever having the data title. At Everstage I took Salesforce, HubSpot and Stripe data apart with SQL and Python to find where commission logic broke, and built the Superset dashboards leadership used for MRR, CAC and quota attainment. On my own time I reconciled 8,000+ rows of election results into one headline: 163 of 234 seats flipped.</p>
+            <p data-for="ba" hidden>Translating between people who speak different languages is the job I already did. At Everstage I was the bridge between product, engineering and customer success for $500K+ ARR accounts: gathering requirements, finding the logic gaps in compensation plans, and streamlining the reporting. I will happily draw the process map, then automate half of it, like the Fathom-to-Freshdesk pipeline that retired a manual step from every customer call.</p>
+          </div>
+          <div class="acts"><a class="btn btn--accent" href="mailto:seshwarsai@gmail.com" data-mail>Email me about this role</a></div>
         </div>
       </article>
 
-      <article class="part" data-part="p3" data-form="seats">
+      <!-- PROJECTS: one per scroll step. The narrator states the problem,
+           Sai states the fix. Every figure is from the original case studies. -->
+      <article class="part" data-part="w1" data-kind="qa" data-len="0.95">
         <div class="fr" data-cue="fr">
-          <p class="kick">Decoding the 2026 Tamil Nadu Election &middot; 2026 &middot; Data analysis</p>
-          <h2>8,000+ rows of raw Election Commission data, and a newsroom that needed one clear story.</h2>
-          <p>Candidate-level results for all 234 constituencies, split across two election cycles, with party and seat names that did not match.</p>
+          <p class="kick"><span>Project 1 of 11</span> NourishAI &middot; 2026 &middot; AI product</p>
+          <h2>Try asking a food app for &ldquo;high-protein, under 500 calories, not fried.&rdquo;</h2>
+          <p>It hears &ldquo;food.&rdquo; The real blocker: restaurant menus carry no nutrition data at all, so the question has nothing to run against.</p>
         </div>
         <div class="sh" data-cue="sh">
-          <p>I cleaned and reconciled both cycles in Python, computed seat flips, vote-share swings and margins, and shipped seven charts and an eleven-slide stakeholder deck. The headline underneath the noise: <b>163 of 234 seats changed party</b>.</p>
-          <p class="cap">Each dot is a seat. The lit ones changed hands: 163 of 234, or 69.7%.</p>
+          <p>So I made the data exist. An LLM pipeline generates and enriches every dish with calories, macros and tags and loads it into Supabase. Then Claude Haiku turns your sentence into rules and Postgres ranks the dishes. The API key never touches the browser.</p>
+          <p class="cap"><b>Result:</b> type a craving in plain English, get ranked dishes with the numbers attached.</p>
         </div>
       </article>
 
-      <article class="part" data-part="p4" data-form="dishes">
+      <article class="part" data-part="w2" data-kind="qa" data-len="0.95">
         <div class="fr" data-cue="fr">
-          <p class="kick">NourishAI &middot; 2026 &middot; AI product</p>
-          <h2>You cannot search a delivery app for &ldquo;high-protein, under 500 calories, not fried.&rdquo;</h2>
-          <p>The deeper blocker: restaurant menus carry no nutrition data at all, so a query like that has nothing to run against.</p>
+          <p class="kick"><span>Project 2 of 11</span> Content Arena (formerly RivalRadar) &middot; 2025 &middot; AI product</p>
+          <h2>&ldquo;Who is my competition?&rdquo; Every YouTuber asks. Subscriber counts do not answer.</h2>
+          <p>The giant channel might be coasting. The one quietly winning your audience might be a tenth its size.</p>
         </div>
         <div class="sh" data-cue="sh">
-          <p>I built the missing data layer with an LLM <b>Generate, Enrich, Load</b> pipeline into Supabase, then a search where Claude Haiku turns the sentence into rules and Postgres ranks the dishes. The API key never touches the browser.</p>
-          <p class="cap">Illustrative data. Each dot is a dish, plotted by calories and protein, and lit when it passes the query.</p>
+          <p>Content Arena finds the channels that are actually comparable and turns their performance into normalised engagement signals, so size stops pretending to be success.</p>
+          <p class="cap"><b>Result:</b> a defensible answer to who your real rivals are and which levers separate you, instead of gut feel.</p>
         </div>
       </article>
 
-      <!-- THE PEAK: the seam floods back to friction, then sweeps the whole
-           width, and every dot on the page lands in the availability window. -->
-      <div class="part peak" data-part="peak" data-form="window">
+      <article class="part" data-part="w3" data-kind="qa" data-len="0.95">
+        <div class="fr" data-cue="fr">
+          <p class="kick"><span>Project 3 of 11</span> Decoding the 2026 Tamil Nadu Election &middot; Data analysis</p>
+          <h2>8,000+ rows of election data, two cycles, and names that refused to match.</h2>
+          <p>All 234 constituencies, and a newsroom that wanted one clear story. The newsroom was fictional (a Codebasics challenge). The deadline felt very real.</p>
+        </div>
+        <div class="sh" data-cue="sh">
+          <p>I cleaned and reconciled both cycles in Python, computed seat flips, vote-share swings and margins, and shipped seven charts and an eleven-slide deck.</p>
+          <p class="cap"><b>Result:</b> <b class="hi">163 of 234 seats changed party</b> (69.7%), and a new entrant took 35.1% of the statewide vote.</p>
+        </div>
+      </article>
+
+      <article class="part" data-part="w4" data-kind="qa" data-len="0.95">
+        <div class="fr" data-cue="fr">
+          <p class="kick"><span>Project 4 of 11</span> Forage PM Job Simulation &middot; 2026 &middot; Product management</p>
+          <h2>Downloads up. Players leaving. Three teams, three opinions, zero agreement.</h2>
+          <p><i>Legends of Aether</i>, a strategy RPG, was a textbook case of one dashboard that everyone reads differently.</p>
+        </div>
+        <div class="sh" data-cue="sh">
+          <p>I picked one KPI per question and argued why the near miss was wrong: <b>7-day retention over DAU</b>, because DAU mixes veterans in and hides new players quietly leaving. Then a 7-step plan that split one deck into three: development, marketing and leadership.</p>
+          <p class="cap"><b>Worked example from my brief:</b> 10,000 installs, 3,000 back on day 7, so 30% retention.</p>
+        </div>
+      </article>
+
+      <article class="part" data-part="w5" data-kind="qa" data-len="0.95">
+        <div class="fr" data-cue="fr">
+          <p class="kick"><span>Project 5 of 11</span> AI Voice Agent for L1 Support &middot; 2025</p>
+          <h2>Support agents answering the same question for the hundredth time today.</h2>
+          <p>Tier 1 calls: known answers, live humans, every single call.</p>
+        </div>
+        <div class="sh" data-cue="sh">
+          <p>I built a voice agent with ElevenLabs and N8N, curated its knowledge base from scratch, and grounded every answer with RAG, so it answers from the knowledge base instead of improvising.</p>
+          <p class="cap"><b>Result:</b> Tier 1 answered autonomously. Humans keep the calls that need judgment.</p>
+        </div>
+      </article>
+
+      <article class="part" data-part="w6" data-kind="qa" data-len="0.95">
+        <div class="fr" data-cue="fr">
+          <p class="kick"><span>Project 6 of 11</span> Fathom &times; Freshdesk Automation &middot; 2025</p>
+          <h2>After every call: copy the summary, paste it into the ticket, repeat forever.</h2>
+          <p>Slow, easy to get wrong, and the first thing skipped on a busy day.</p>
+        </div>
+        <div class="sh" data-cue="sh">
+          <p>An N8N pipeline now does it alone. The call ends, a webhook fires, and the AI summary and recording land in the right Freshdesk ticket, with routing logic for the edge cases.</p>
+          <p class="cap"><b>Result:</b> zero-touch call documentation. The copy-paste job was retired with full honours.</p>
+        </div>
+      </article>
+
+      <article class="part" data-part="w7" data-kind="qa" data-len="0.95">
+        <div class="fr" data-cue="fr">
+          <p class="kick"><span>Project 7 of 11</span> IoV Security with ASCON &middot; 2023 to 2024 &middot; Research</p>
+          <h2>Cars on 5G share safety-critical data on hardware too small for heavy encryption.</h2>
+          <p>Strong security is too slow. Fast security is too weak. &ldquo;Just pick one,&rdquo; said nobody who drives.</p>
+        </div>
+        <div class="sh" data-cue="sh">
+          <p>I ran the ASCON lightweight cipher on Raspberry Pi boards over MQTT, attacked the setup with DoS and man-in-the-middle simulations, and trained an ensemble ML classifier to catch the intrusions.</p>
+          <p class="cap"><b>Result:</b> 99.95% DoS detection accuracy, NPCR 99.42%, and a Springer Nature paper. More on that shortly.</p>
+        </div>
+      </article>
+
+      <article class="part" data-part="w8" data-kind="qa" data-len="0.95">
+        <div class="fr" data-cue="fr">
+          <p class="kick"><span>Project 8 of 11</span> Crop Yield Predictor &middot; 2023 &middot; Machine learning</p>
+          <h2>Crops chosen by tradition, while the soil holds the actual answer.</h2>
+          <p>Soil type, moisture, pH and crop history predict what will grow. Tradition has never once checked the pH.</p>
+        </div>
+        <div class="sh" data-cue="sh">
+          <p>I engineered features from Kaggle agricultural datasets and trained a Random Forest, validated on held-out data, that turns soil readings into a crop recommendation.</p>
+          <p class="cap"><b>Result:</b> 98% validation accuracy.</p>
+        </div>
+      </article>
+
+      <article class="part" data-part="w9" data-kind="qa" data-len="0.95">
+        <div class="fr" data-cue="fr">
+          <p class="kick"><span>Project 9 of 11</span> Smart Granary System &middot; 2024 &middot; IoT</p>
+          <h2>Stored grain spoils quietly, and nobody can watch a granary all night.</h2>
+          <p>Temperature and CO2 drift, and the first alert is usually the smell.</p>
+        </div>
+        <div class="sh" data-cue="sh">
+          <p>I built a system that tracks temperature and CO2 against set thresholds around the clock and flags action the moment conditions drift.</p>
+          <p class="cap"><b>Result:</b> storage kept in range with far less manual monitoring, and fewer losses.</p>
+        </div>
+      </article>
+
+      <article class="part" data-part="w10" data-kind="qa" data-len="0.95">
+        <div class="fr" data-cue="fr">
+          <p class="kick"><span>Project 10 of 11</span> Posture Correcting Device &middot; 2024 &middot; Hardware</p>
+          <h2>You are probably slouching right now.</h2>
+          <p>Bad posture builds up over long desk sessions, and you notice only when your back files a formal complaint.</p>
+        </div>
+        <div class="sh" data-cue="sh">
+          <p>I built a wearable around an Arduino Nano with an accelerometer and gyroscope, plus Embedded C that spots misalignment in real time and fires a vibration motor.</p>
+          <p class="cap"><b>Result:</b> a polite buzz the moment you slump. Sit up. It is watching.</p>
+        </div>
+      </article>
+
+      <article class="part" data-part="w11" data-kind="qa" data-len="0.95">
+        <div class="fr" data-cue="fr">
+          <p class="kick"><span>Project 11 of 11</span> Federated Learning for D2D Networks &middot; 2023 &middot; Research internship</p>
+          <h2>Devices that must decide how to talk to each other, with nobody in charge.</h2>
+          <p>Device-to-device networks balance energy, distance and signal quality without a central coordinator. Group projects, but for radios.</p>
+        </div>
+        <div class="sh" data-cue="sh">
+          <p>Onsite at the University of Cyprus, I simulated a decentralised network in NS3, clustered its nodes four different ways, and trained a neural network to pick transmission modes.</p>
+          <p class="cap"><b>Result:</b> a working mode-selection model for the group's federated learning research, and a crash course in working inside an international research team.</p>
+        </div>
+      </article>
+
+      <!-- PUBLICATIONS -->
+      <article class="part" data-part="pubs" data-kind="qa" data-len="1.4">
+        <div class="fr" data-cue="fr">
+          <p class="kick">Publications</p>
+          <h2>Right. Publications. What has this guy actually published?</h2>
+          <p>Two peer-reviewed journal papers about keeping connected cars from getting hacked. Real journals. Real reviewers. He will absolutely bring this up in the interview.</p>
+        </div>
+        <div class="sh sh--pubs" data-cue="sh">
+          <ol class="pubs">
+            <li>
+              <p class="pubs__meta">2026 &middot; Russian Microelectronics, vol. 55 no. 1 &middot; Pleiades Publishing, distributed by Springer Nature &middot; Scopus indexed</p>
+              <a class="pubs__t" href="https://doi.org/10.1134/S106373972660007X" target="_blank" rel="noopener">Quantum-Resistant Microelectronic Cryptography for Securing Vehicular Networks</a>
+              <p class="pubs__tr"><b>In plain words:</b> cryptography for cars, built to hold up even against quantum computers. Planning ahead is a personality trait.</p>
+            </li>
+            <li>
+              <p class="pubs__meta">2025 &middot; Discover Internet of Things &middot; Springer Nature &middot; Open Access</p>
+              <a class="pubs__t" href="https://doi.org/10.1007/s43926-025-00226-1" target="_blank" rel="noopener">Improving Security in 5G Vehicular Networks Using ASCON and Machine Learning based NIDS</a>
+              <p class="pubs__tr"><b>In plain words:</b> encryption light enough for a Raspberry Pi, plus an intrusion detector at 99.95% DoS detection accuracy. Your car's data, now with a bouncer.</p>
+            </li>
+          </ol>
+        </div>
+      </article>
+
+      <!-- authored silence: the seam floods back to friction, no copy -->
+      <div class="part" data-part="quiet" data-kind="quiet" data-len="0.35" aria-hidden="true"></div>
+
+      <!-- THE PEAK: the seam sweeps the whole width and friction is gone. -->
+      <div class="part peak" data-part="peak" data-kind="peak" data-len="1.5">
         <div class="peak__copy" data-cue="peak">
+          <p class="kick">All of that, available</p>
           <h2>Open to internships from December 2026 to December 2027.</h2>
-          <p>Credit-bearing, through my NUS MSc, in Singapore. Product Management, Data Analyst or Business Analyst.</p>
+          <p>Credit-bearing, through my NUS MSc, in Singapore. <span data-role="pm">Product Management</span>, <span data-role="da">Data Analyst</span> or <span data-role="ba">Business Analyst</span>.</p>
           <div class="acts">
             <a class="btn btn--accent" href="Sai_Eshwar_Resume.pdf" download>Download CV</a>
-            <a class="btn btn--ghost" href="mailto:seshwarsai@gmail.com">seshwarsai@gmail.com</a>
+            <a class="btn btn--ghost" href="mailto:seshwarsai@gmail.com" data-mail>seshwarsai@gmail.com</a>
             <button type="button" class="btn btn--ghost" data-cli>Ask sai.cli anything</button>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- EVERYTHING BELOW IS THE LEDGER: facts, on the shipped ground. -->
-  <section class="ledger" id="more" aria-labelledby="more-h">
-    <div class="wrap">
-      <header class="ledger__head" data-sc-in>
-        <h2 id="more-h">More shipped work</h2>
-        <p>Every project on the same label: the friction, what I built, and what changed.</p>
-      </header>
-
-      <ol class="index" data-sc-in data-sc-stagger="45">
-        <li><details>
-          <summary><span class="ix__name">Content Arena <small>(formerly RivalRadar)</small></span><span class="ix__line">Who is my real competition? Normalised engagement signals for YouTube creators.</span><span class="ix__meta">2025 &middot; AI product</span></summary>
-          <dl class="lbl">
-            <dt>Friction</dt><dd>Creators know competition matters, but raw subscriber counts and view totals hide who is actually winning the same audience.</dd>
-            <dt>Built</dt><dd>A competitor intelligence platform that discovers comparable channels and converts their performance into structured, normalised engagement signals.</dd>
-            <dt>Changed</dt><dd>Creators get a defensible answer to who their real rivals are and which engagement levers separate them, instead of gut feel.</dd>
-            <dt>Tools</dt><dd>YouTube Data API &middot; Vercel serverless &middot; competitor intelligence</dd>
-          </dl>
-        </details></li>
-        <li><details>
-          <summary><span class="ix__name">AI Voice Agent for L1 Support</span><span class="ix__line">Tier 1 support calls answered autonomously, grounded in a knowledge base I built.</span><span class="ix__meta">2025 &middot; AI &amp; automation</span></summary>
-          <dl class="lbl">
-            <dt>Friction</dt><dd>Support agents spent a large share of their day on repetitive Tier 1 questions with known answers.</dd>
-            <dt>Built</dt><dd>A voice agent with ElevenLabs and N8N, a structured knowledge base curated from scratch, and a RAG pipeline so every answer is grounded in real product information.</dd>
-            <dt>Changed</dt><dd>Tier 1 queries handled autonomously, freeing human agents for the calls that need judgment.</dd>
-            <dt>Tools</dt><dd>ElevenLabs &middot; N8N &middot; RAG &middot; knowledge base design</dd>
-          </dl>
-        </details></li>
-        <li><details>
-          <summary><span class="ix__name">Fathom &times; Freshdesk Automation</span><span class="ix__line">Call ends, and the AI summary and recording land in the right ticket on their own.</span><span class="ix__meta">2025 &middot; Automation</span></summary>
-          <dl class="lbl">
-            <dt>Friction</dt><dd>After every customer call someone copied the summary and recording link into the matching ticket by hand. Slow, error prone, and skipped under load.</dd>
-            <dt>Built</dt><dd>An N8N pipeline triggered on call completion: webhooks, REST API integrations, and conditional routing to match each call to the correct ticket.</dd>
-            <dt>Changed</dt><dd>Post-call documentation became fully automatic, with no human step in the loop.</dd>
-            <dt>Tools</dt><dd>N8N &middot; Fathom API &middot; Freshdesk API &middot; webhooks</dd>
-          </dl>
-        </details></li>
-        <li><details>
-          <summary><span class="ix__name">IoV Security with ASCON</span><span class="ix__line">Lightweight cryptography on real hardware and an ML intrusion detector. Published.</span><span class="ix__meta">2023 to 2024 &middot; Research</span></summary>
-          <dl class="lbl">
-            <dt>Friction</dt><dd>Vehicles on 5G networks exchange safety-critical data on constrained hardware. Heavy encryption is too slow; weak security invites DoS and MITM attacks.</dd>
-            <dt>Built</dt><dd>ASCON on Raspberry Pi boards over MQTT, simulated DoS, MITM and password attacks with Snort and Kali Linux, and an ensemble ML voting classifier trained on CICIDS2017.</dd>
-            <dt>Changed</dt><dd>99.95% DoS detection accuracy, ASCON validated at NPCR 99.42% against PRESENT, and a Springer Nature publication (2025).</dd>
-            <dt>Tools</dt><dd>ASCON &middot; Raspberry Pi &middot; MQTT &middot; Snort &middot; CICIDS2017</dd>
-          </dl>
-        </details></li>
-        <li><details>
-          <summary><span class="ix__name">Smart Granary System</span><span class="ix__line">Temperature and CO2 thresholds that catch spoilage conditions before losses.</span><span class="ix__meta">2024 &middot; IoT</span></summary>
-          <dl class="lbl">
-            <dt>Friction</dt><dd>Stored grain spoils when temperature and CO2 drift, and round-the-clock manual monitoring does not scale.</dd>
-            <dt>Built</dt><dd>A system that continuously tracks temperature and CO2 against defined thresholds and flags action the moment conditions drift.</dd>
-            <dt>Changed</dt><dd>Optimal storage conditions with far less manual monitoring, reducing grain losses.</dd>
-            <dt>Tools</dt><dd>IoT sensors &middot; threshold monitoring &middot; embedded systems</dd>
-          </dl>
-        </details></li>
-        <li><details>
-          <summary><span class="ix__name">Posture Correcting Device</span><span class="ix__line">A wearable that senses misalignment and nudges you upright.</span><span class="ix__meta">2024 &middot; Hardware</span></summary>
-          <dl class="lbl">
-            <dt>Friction</dt><dd>Poor posture builds up silently over long desk sessions, and people notice only once the strain has set in.</dd>
-            <dt>Built</dt><dd>An Arduino Nano wearable with accelerometer and gyroscope sensors, and Embedded C that detects deviation from correct posture in real time.</dd>
-            <dt>Changed</dt><dd>A vibration alert the instant alignment slips, so the wearer corrects in the moment.</dd>
-            <dt>Tools</dt><dd>Arduino Nano &middot; Embedded C &middot; accelerometer and gyroscope</dd>
-          </dl>
-        </details></li>
-        <li><details>
-          <summary><span class="ix__name">Crop Yield Predictor</span><span class="ix__line">Soil data turned into crop decisions, at 98% validation accuracy.</span><span class="ix__meta">2023 &middot; Machine learning</span></summary>
-          <dl class="lbl">
-            <dt>Friction</dt><dd>Crop selection is often driven by tradition, yet soil type, moisture, pH and crop history strongly predict what will grow well.</dd>
-            <dt>Built</dt><dd>Feature engineering across soil and crop-history variables from Kaggle datasets, and a Random Forest model validated on held-out data.</dd>
-            <dt>Changed</dt><dd>98% prediction accuracy on validation data, turned into an actionable recommendation.</dd>
-            <dt>Tools</dt><dd>Python &middot; Random Forest &middot; Kaggle</dd>
-          </dl>
-        </details></li>
-        <li><details>
-          <summary><span class="ix__name">Federated Learning for D2D Networks</span><span class="ix__line">Onsite research in Nicosia on distributed ML for transmission mode selection.</span><span class="ix__meta">2023 &middot; Research internship</span></summary>
-          <dl class="lbl">
-            <dt>Friction</dt><dd>Device-to-device systems must pick transmission modes dynamically, balancing energy, distance and signal quality without central coordination.</dd>
-            <dt>Built</dt><dd>An NS3 simulation of a decentralised network, K-Means, OPTICS, Spectral and Ward clustering, and a neural network selecting transmission modes, visualised in NetAnim.</dd>
-            <dt>Changed</dt><dd>A working mode-selection model for the group's federated learning research, built inside an international team.</dd>
-            <dt>Tools</dt><dd>NS3 &middot; clustering &middot; neural networks &middot; NetAnim</dd>
-          </dl>
-        </details></li>
-      </ol>
     </div>
   </section>
 
@@ -258,7 +325,7 @@
     <div class="wrap">
       <header class="ledger__head" data-sc-in>
         <h2 id="cred-h">Credentials</h2>
-        <p>Independently verifiable. Every link goes to the issuer.</p>
+        <p>Independently verifiable. Every certificate links to its issuer.</p>
       </header>
       <div class="creds">
         <div class="col" data-sc-in>
@@ -280,12 +347,7 @@
           </dl>
         </div>
         <div class="col" data-sc-in>
-          <h3>Publications</h3>
-          <dl class="rows">
-            <dt><a href="https://doi.org/10.1134/S106373972660007X" target="_blank" rel="noopener">Quantum-Resistant Microelectronic Cryptography for Securing Vehicular Networks</a></dt><dd>Russian Microelectronics, vol. 55 no. 1 &middot; Pleiades Publishing, distributed by Springer Nature &middot; Scopus indexed &middot; 2026</dd>
-            <dt><a href="https://doi.org/10.1007/s43926-025-00226-1" target="_blank" rel="noopener">Improving Security in 5G Vehicular Networks Using ASCON and Machine Learning based NIDS</a></dt><dd>Discover Internet of Things &middot; Springer Nature &middot; Open Access &middot; 2025</dd>
-          </dl>
-          <h3 class="col__h3b">Leadership</h3>
+          <h3>Leadership</h3>
           <dl class="rows">
             <dt>National Service Scheme</dt><dd>Headed a campus-wide health and hygiene campaign reaching 200+ students and residents</dd>
             <dt>INVENTE 6.0, Event Supervisor</dt><dd>Led a team of ten running a flagship technical event for 150+ participants</dd>
@@ -301,7 +363,7 @@
       <h2 id="close-h">Hiring for December 2026 to December 2027?</h2>
       <p>Email is the fastest way in. The CV has everything above on one page.</p>
       <div class="acts">
-        <a class="btn btn--accent" href="mailto:seshwarsai@gmail.com">seshwarsai@gmail.com</a>
+        <a class="btn btn--accent" href="mailto:seshwarsai@gmail.com" data-mail>seshwarsai@gmail.com</a>
         <a class="btn btn--ghost" href="Sai_Eshwar_Resume.pdf" download>Download CV</a>
         <a class="btn btn--ghost" href="https://linkedin.com/in/sai-eshwar-s-b529931bb" target="_blank" rel="noopener">LinkedIn</a>
       </div>
