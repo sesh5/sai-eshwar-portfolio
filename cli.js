@@ -82,7 +82,7 @@
     whoami:[
       '<span class="c-acc">Sai Eshwar</span> <span class="c-dim">&middot; product &middot; ai &middot; data &middot; NUS Singapore</span>',
       '',
-      'Currently pursuing an <span class="c-txt">MSc in Management of Technology and Innovation</span> at NUS. Previously Senior Solution &amp; CX Specialist at <span class="c-txt">Everstage</span> (B2B SaaS, sales compensation, May 2024 &ndash; Jun 2026): owned enterprise implementations end to end: $500K+ ARR accounts, configurations touching 1,000+ payees per org, while the business scaled $5M &rarr; $10M ARR.',
+      'Currently pursuing an <span class="c-txt">MSc in Management of Technology and Innovation</span> at NUS. Previously Senior Solution and Data Analyst at <span class="c-txt">Everstage</span> (B2B SaaS, sales compensation, May 2024 &ndash; Jun 2026): owned enterprise implementations end to end: $500K+ ARR accounts, configurations touching 1,000+ payees per org, while the business scaled $5M &rarr; $10M ARR.',
       '',
       'Builder on the side: 10 shipped projects across AI, automation and data (<span class="c-txt">/projects</span>). Published researcher: two peer-reviewed journal papers (Springer Nature 2025, Russian Microelectronics 2026). AWS Certified AI Practitioner, Cloud Practitioner &amp; Machine Learning Engineer &ndash; Associate, Certified ScrumMaster&reg;, HelloPM Tech for PM.',
       '',
@@ -108,11 +108,14 @@
     experience:[
       '<span class="c-acc">experience</span>',
       '',
-      '<span class="c-txt">Everstage Technologies</span> <span class="c-dim">&middot; Sr. Solution &amp; CX Specialist &middot; May 2024 &rarr; Jun 2026 &middot; Chennai</span>',
+      '<span class="c-txt">Everstage Technologies</span> <span class="c-dim">&middot; Senior Solution and Data Analyst &middot; May 2024 &rarr; Jun 2026 &middot; Chennai</span>',
       '&#9657; End-to-end owner of enterprise comp implementations: $500K+ ARR clients, 1,000+ payees per org, primary liaison for international stakeholders.',
       '&#9657; Grew with the business as it scaled <span class="c-txt">$5M &rarr; $10M ARR</span>.',
       '&#9657; SQL + Python over Salesforce/HubSpot/Stripe data to find comp logic gaps; Apache Superset dashboards for MRR, CAC, TCV, quota attainment.',
       '&#9657; The bridge between product, engineering and customer success.',
+      '',
+      '<span class="c-txt">Forage</span> <span class="c-dim">&middot; Product Management Job Simulation (virtual) &middot; Sep 2026</span>',
+      '&#9657; KPI brief for a strategy RPG (7-day retention, DAU, churn, conversion) and a 7-step stakeholder-presentation plan with owners, dependencies and approval points.',
       '',
       '<span class="c-txt">University of Cyprus</span> <span class="c-dim">&middot; Research Intern (onsite) &middot; Jun-Aug 2023 &middot; Nicosia</span>',
       '&#9657; Federated learning / distributed ML for D2D transmission mode selection; NS3 simulation, clustering, neural network in Python.'
@@ -230,7 +233,7 @@
       '<span class="c-acc">the pitch</span>',
       '',
       '&#9657; <span class="c-txt">Proof over claims</span>: $500K+ ARR accounts owned end to end, 1,000+ payees per config, a $5M&rarr;$10M ARR ride, two peer-reviewed journal papers, 10 shipped projects.',
-      '&#9657; <span class="c-txt">Builds what he specs</span>: the discovery instincts of a CX specialist plus the hands to ship the prototype the same week (this CLI included).',
+      '&#9657; <span class="c-txt">Builds what he specs</span>: the discovery instincts of someone who sat with enterprise customers every day, plus the hands to ship the prototype the same week (this CLI included).',
       '&#9657; <span class="c-txt">Certified on both halves</span>: AWS AI/Cloud/ML Engineer on the tech side, CSM + Tech for PM on the process side.',
       '',
       'Ask for specifics: <span class="c-txt">/projects</span> or <span class="c-txt">/experience</span>. Or skip ahead: <span class="c-txt">/contact</span>.']},
