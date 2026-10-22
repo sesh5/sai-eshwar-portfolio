@@ -66,6 +66,17 @@
         </div>
       </div>
 
+      <!-- MEET: the photo comes alive. Scroll and he smiles, scroll on and he
+           winks, then the narrator moves things along. face.js scrubs the
+           expression; story.js writes the two cue windows. -->
+      <div class="part meet" data-part="meet" data-kind="meet" data-len="2.2">
+        <div class="meet__fig" id="meet">
+          <img class="meet__still" src="sai.webp" alt="Sai Eshwar" width="680" height="868" decoding="async">
+        </div>
+        <p class="meet__hi" data-cue="hi">Meet Sai.</p>
+        <h2 class="meet__line" data-cue="line">Now, let&rsquo;s get into what this guy has done.</h2>
+      </div>
+
       <!-- ABOUT, part one: who is this guy -->
       <article class="part" data-part="about" data-scene="route" data-kind="qa" data-len="1.25">
         <div class="fr" data-cue="fr">
@@ -402,6 +413,7 @@
 
 <script src="scrollcraft.js"></script>
 <script src="scenes.js"></script>
+<script src="face.js"></script>
 <script src="story.js"></script>
 <script src="cli.js"></script>
 </body>

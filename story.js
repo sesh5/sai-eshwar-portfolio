@@ -63,6 +63,11 @@
     if (s.kind === 'hero') {
       // Greet: fully present on the first frame, never an empty stage.
       cue(s.el.querySelector('[data-cue="hero"]'), cwin(0, 0, 0.55 * L, 0.97 * L));
+    } else if (s.kind === 'meet') {
+      // The face does the talking (face.js); the narrator says hello while
+      // he smiles, then moves things along once the wink is done.
+      cue(s.el.querySelector('[data-cue="hi"]'), cwin(s.s + 0.04 * L, s.s + 0.12 * L, s.s + 0.56 * L, s.s + 0.64 * L));
+      cue(s.el.querySelector('[data-cue="line"]'), cwin(s.s + 0.72 * L, s.s + 0.8 * L, s.s + 0.88 * L, s.s + 0.97 * L));
     } else if (s.kind === 'qa') {
       cue(fr, cwin(s.s + 0.03 * L, s.s + 0.15 * L, s.s + 0.42 * L, s.s + 0.51 * L));
       cue(sh, cwin(s.s + 0.64 * L, s.s + 0.75 * L, s.e, s.e + tail));
@@ -191,6 +196,13 @@
       s.sc.update(reduce ? 1 : qc, t);
       if (s === cur) sig = s.id + ':' + qc.toFixed(2);
     });
+
+    // The portrait: its own beat, its own clock for the blinks.
+    var meet = seg('meet');
+    if (meet && window.FACE) {
+      var fs = window.FACE.update((Us - meet.s) / meet.len, (performance.now() - t0) / 1000, phone, W, H);
+      if (cur === meet) sig = 'meet:' + fs;
+    }
 
     // The hero's layers drift apart at different rates as the page starts to
     // move: depth from differential motion, and never a dead first scroll.
