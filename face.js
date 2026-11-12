@@ -76,7 +76,7 @@
   // falls into shade while a rim of the chapter's accent catches the edge.
   var STEP = 5;                          // one vertex every 5 source pixels
   var PAD = { x: 0.14, top: 0.08 };      // room around the figure to turn into
-  var ZS = 0.30, PIVOT_D = 0.5;          // relief depth, and the depth it turns about
+  var ZS = 0.2, PIVOT_D = 0.5;           // relief depth, and the depth it turns about
   var HEAD_Y = 0.5 - 300 / 868;          // the head's centre, in model units (height 1)
   var CAM = 2.4;                         // camera distance, in figure heights
   var VS = [
@@ -105,9 +105,9 @@
     '  if(c.a<.03)discard;',
     '  vec3 n=normalize(vN);',
     '  float dif=max(dot(n,normalize(vec3(-.45,.5,.85))),0.);',
-    '  float shade=.66+.45*dif;',
+    '  float shade=.84+.2*dif;',
     '  float rim=pow(1.-clamp(n.z,0.,1.),2.2);',
-    '  gl_FragColor=vec4(c.rgb*shade+uRim*rim*.55*c.a,c.a);',
+    '  gl_FragColor=vec4(c.rgb*shade+uRim*rim*.16*c.a,c.a);',
     '}'
   ].join('\n');
 
@@ -214,7 +214,7 @@
     glDirty = true;
   }
 
-  var glW = 0, glH = 0, glYaw = 99, glPitch = 99, MAX_YAW = 0.5, MAX_PITCH = 0.2;
+  var glW = 0, glH = 0, glYaw = 99, glPitch = 99, MAX_YAW = 0.3, MAX_PITCH = 0.12;
   function glDraw(w, h, yaw, pitch) {
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var bw = Math.round(Math.min(w * (1 + 2 * PAD.x) * dpr, 2000)), bh = Math.round(bw * (h * (1 + PAD.top)) / (w * (1 + 2 * PAD.x)));
@@ -286,7 +286,7 @@
 
   addEventListener('pointermove', function (e) {
     if (drag && e.pointerId === drag.id) {
-      drag.yaw = 0.88 * Math.tanh((drag.y0 + (e.clientX - drag.x) / 150) / 0.88);   // rubber-band past ~25 degrees
+      drag.yaw = 0.8 * Math.tanh((drag.y0 + (e.clientX - drag.x) / 180) / 0.8);   // rubber-band past ~14 degrees
       drag.pitch = 0.6 * Math.tanh((drag.p0 + (e.clientY - drag.yy) / 220) / 0.6);
       if (!touched && Math.abs(e.clientX - drag.x) > 8) touched = true;
       return;
@@ -359,9 +359,9 @@
     var arrive = 1 - win(q, -0.04, 0.18);
     var settled = 1 - arrive;
     // a slow idle sway, so the volume shows even before anyone touches him
-    var sway = Math.sin(t * 0.55) * 0.16 + Math.sin(t * 0.23 + 1.3) * 0.08;
-    var tYaw = 1.05 * arrive + sway * settled, tPitch = Math.sin(t * 0.41) * 0.12 * settled;
-    if (finePointer) { tYaw += follow.x * 0.75 * settled; tPitch += follow.y * 0.5 * settled; }
+    var sway = Math.sin(t * 0.55) * 0.07 + Math.sin(t * 0.23 + 1.3) * 0.03;
+    var tYaw = 0.7 * arrive + sway * settled, tPitch = Math.sin(t * 0.41) * 0.05 * settled;
+    if (finePointer) { tYaw += follow.x * 0.45 * settled; tPitch += follow.y * 0.3 * settled; }
     if (!phone) tYaw = lerp(tYaw, -0.55, m);
     if (reduce) { tYaw = 0; tPitch = 0; }
     stepSpring(tYaw, tPitch);
