@@ -165,6 +165,19 @@ b { font-weight: 600; color: var(--ink); }
   background: radial-gradient(closest-side, color-mix(in oklab, var(--a) 22%, transparent), transparent);
 }
 .meet__still, .meet__cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* he can be turned: grab him on desktop, drag sideways on a phone (vertical
+   swipes still scroll the page) */
+.meet__fig { pointer-events: auto; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.meet__fig.is-dragging { cursor: grabbing; }
+.meet__gl { transform-origin: 50% 58%; }
+.meet__hint {
+  position: absolute; left: 50%; bottom: 96px; translate: -50% 0; margin: 0; z-index: 2; opacity: 0; pointer-events: none;
+  display: inline-flex; align-items: center; gap: 10px; padding: 9px 16px; border-radius: 999px;
+  font: italic 500 16px/1 var(--font-voice); color: var(--ink);
+  background: color-mix(in oklab, var(--g) 70%, transparent); border: 1px solid var(--sc-hairline-strong);
+  backdrop-filter: blur(8px); white-space: nowrap;
+}
+.meet__hint svg { width: 22px; height: 11px; fill: none; stroke: var(--a); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .meet__hi {
   position: absolute; left: var(--sc-gutter); top: 52%; translate: 0 -50%; margin: 0; max-width: 14rem;
   font: italic 500 clamp(1.8rem, 1rem + 1.8vw, 2.9rem)/1.05 var(--font-voice); color: var(--soft);
@@ -357,6 +370,8 @@ b { font-weight: 600; color: var(--ink); }
 
   .meet__hi, .meet__line { top: calc(var(--bar-h) + 18px); translate: none; right: var(--sc-gutter); width: auto; max-width: none; }
   .meet__hi { font-size: clamp(1.6rem, 7vw, 2rem); }
+  .meet__hint { bottom: 82px; font-size: 14.5px; white-space: nowrap; }
+  .facts__opt { display: none; }
   .meet__line { font-size: clamp(1.8rem, 7.6vw, 2.3rem); }
 
   .fr, .sh { width: auto; left: var(--sc-gutter); right: var(--sc-gutter); }
