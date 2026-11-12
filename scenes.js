@@ -14,10 +14,24 @@
   'use strict';
 
   var NS = 'http://www.w3.org/2000/svg';
+  // The palette is per chapter: story.js calls setPalette() with that beat's
+  // ground and accent before every build and update, so each scene is drawn in
+  // its own chapter's colours. Neutrals are mixed from the ground toward the ink.
   var C = {
-    ink: '#ecebe6', soft: '#a3a39b', dim: '#5b5e63', line: '#2a2d33', card: '#15171b', card2: '#1c1f24',
-    acc: '#43e29b', red: '#ff5a4f', yt: '#ff3b3b', gold: '#f4c542', blue: '#6aa9ff'
+    ink: '#f3efe6', soft: '#b5b2c4', dim: '#5b5e73', line: '#2a2d43', card: '#171a33', card2: '#1e2240',
+    acc: '#ffb547', accInk: '#0f1430', bg: '#0f1430',
+    red: '#ff5a4f', yt: '#ff3b3b', gold: '#f4c542', blue: '#6aa9ff'
   };
+  function hex2(h) { h = h.replace('#', ''); return [0, 2, 4].map(function (i) { return parseInt(h.substr(i, 2), 16); }); }
+  function mix(a, b, t) { var A = hex2(a), B = hex2(b); return '#' + A.map(function (v, i) { return ('0' + Math.round(v + (B[i] - v) * t).toString(16)).slice(-2); }).join(''); }
+  function at(a) { var A = hex2(C.acc); return 'rgba(' + A.join(',') + ',' + a + ')'; }
+  function setPalette(p) {
+    if (!p || p === C._p) return;
+    C._p = p;
+    C.bg = p.g; C.ink = p.ink; C.acc = p.a; C.accInk = p.ai;
+    C.soft = mix(p.g, p.ink, 0.7); C.dim = mix(p.g, p.ink, 0.3); C.line = mix(p.g, p.ink, 0.15);
+    C.card = mix(p.g, p.ink, 0.06); C.card2 = mix(p.g, p.ink, 0.11);
+  }
 
   function el(tag, a, p) {
     var e = document.createElementNS(NS, tag);
@@ -119,7 +133,7 @@
       this.ftag = this.tag(g, '✕  fried', C.red);
 
       var sp = this.search = el('g', {}, g);
-      pill(sp, 30, 14, 340, 38, C.card2, '#34383f');
+      pill(sp, 30, 14, 340, 38, C.card2, C.dim);
       el('circle', { cx: 52, cy: 32, r: 7, fill: 'none', stroke: C.soft, 'stroke-width': 2 }, sp);
       el('line', { x1: 57, y1: 37, x2: 62, y2: 42, stroke: C.soft, 'stroke-width': 2, 'stroke-linecap': 'round' }, sp);
       this.q = txt('', { x: 72, y: 37.5, fill: C.ink, 'font-size': 13.5 }, sp);
@@ -135,7 +149,7 @@
       el('path', { d: 'M-86 -22 Q-86 46 0 46 Q86 46 86 -22 Z', fill: '#e9e4d8' }, bw);
       el('path', { d: 'M-86 -22 Q-86 46 0 46 Q86 46 86 -22', fill: 'none', stroke: '#c9c2b2', 'stroke-width': 2 }, bw);
       this.checks = ['✓  high-protein', '✓  under 500 kcal', '✓  not fried'].map(function (s, i) {
-        var t = el('g', {}, g); pill(t, 0, 0, 128, 26, 'rgba(67,226,155,0.12)', C.acc);
+        var t = el('g', {}, g); pill(t, 0, 0, 128, 26, at(0.12), C.acc);
         txt(s, { x: 64, y: 17.5, 'text-anchor': 'middle', fill: C.acc, 'font-size': 12, 'font-weight': 600 }, t);
         return t;
       });
@@ -182,7 +196,7 @@
     build: function (g) {
       var pl = el('g', {}, g);
       el('rect', { x: 40, y: 10, width: 320, height: 150, rx: 16, fill: C.card, stroke: C.line }, pl);
-      el('rect', { x: 52, y: 22, width: 296, height: 112, rx: 10, fill: '#1d1418' }, pl);
+      el('rect', { x: 52, y: 22, width: 296, height: 112, rx: 10, fill: 'rgba(0,0,0,0.32)' }, pl);
       this.play = el('g', {}, pl);
       el('rect', { x: -34, y: -24, width: 68, height: 48, rx: 14, fill: C.yt }, this.play);
       el('path', { d: 'M-9 -13 L15 0 L-9 13 Z', fill: '#fff' }, this.play);
@@ -201,7 +215,7 @@
       rows.forEach(function (r, i) {
         r.i0 = i; r.i1 = byEng.indexOf(r);
         r.g = el('g', {}, g);
-        r.bg = el('rect', { x: 34, y: -11, width: 282, height: 22, rx: 8, fill: '#0a0b0d' }, r.g);
+        r.bg = el('rect', { x: 34, y: -11, width: 282, height: 22, rx: 8, fill: C.bg }, r.g);
         el('circle', { cx: 50, cy: 0, r: 9, fill: r.col }, r.g);
         txt(r.n, { x: 66, y: 4, fill: C.ink, 'font-size': 12.5 }, r.g);
         el('rect', { x: 140, y: -6, width: 168, height: 12, rx: 6, fill: C.line }, r.g);
@@ -209,7 +223,7 @@
       });
       this.rows = rows;
       this.badge = el('g', {}, g);
-      pill(this.badge, 0, -11, 78, 22, 'rgba(67,226,155,0.14)', C.acc);
+      pill(this.badge, 0, -11, 78, 22, at(0.14), C.acc);
       txt('real rival', { x: 39, y: 4, 'text-anchor': 'middle', fill: C.acc, 'font-size': 11, 'font-weight': 600 }, this.badge);
     },
     update: function (q, t) {
@@ -229,7 +243,7 @@
         var y = 206 + lerp(from, to, f) * 24;
         var dx = climbing ? Math.sin(Math.PI * f) * 14 : 0;
         // the climber is a raised card that slides over the rows it passes
-        r.bg.setAttribute('fill', climbing ? C.card2 : '#0a0b0d');
+        r.bg.setAttribute('fill', climbing ? C.card2 : C.bg);
         r.bg.setAttribute('stroke', climbing ? C.acc : 'none');
         if (climbing && parent.lastChild !== r.g) parent.insertBefore(r.g, null);
         var w = lerp(r.subs, r.eng, m) * 168 * win(q, 0.08 + i * 0.04, 0.22 + i * 0.04);
@@ -330,18 +344,18 @@
   S.voice = {
     build: function (g) {
       var ph = this.phone = el('g', {}, g);
-      el('rect', { x: -38, y: -70, width: 76, height: 140, rx: 14, fill: C.card, stroke: '#3a3e45', 'stroke-width': 2 }, ph);
-      el('rect', { x: -30, y: -58, width: 60, height: 112, rx: 6, fill: '#12161a' }, ph);
+      el('rect', { x: -38, y: -70, width: 76, height: 140, rx: 14, fill: C.card, stroke: C.dim, 'stroke-width': 2 }, ph);
+      el('rect', { x: -30, y: -58, width: 60, height: 112, rx: 6, fill: 'rgba(0,0,0,0.38)' }, ph);
       txt('Tier 1', { x: 0, y: -30, 'text-anchor': 'middle', fill: C.soft, 'font-size': 10 }, ph);
       txt('call', { x: 0, y: -17, 'text-anchor': 'middle', fill: C.soft, 'font-size': 10 }, ph);
       el('circle', { cx: 0, cy: 28, r: 12, fill: C.acc }, ph);
-      el('path', { d: 'M-5 24 q5 10 10 0', fill: 'none', stroke: '#04140c', 'stroke-width': 2.4, 'stroke-linecap': 'round' }, ph);
+      el('path', { d: 'M-5 24 q5 10 10 0', fill: 'none', stroke: C.accInk, 'stroke-width': 2.4, 'stroke-linecap': 'round' }, ph);
       this.rings = [0, 1, 2].map(function () { return el('circle', { cx: 0, cy: 0, r: 50, fill: 'none', stroke: C.acc, 'stroke-width': 1.5 }, g); });
       this.bars = [];
       for (var i = 0; i < 22; i++) this.bars.push(el('rect', { x: 150 + i * 9.6, y: 60, width: 5, height: 4, rx: 2.5, fill: C.acc }, g));
       function bubble(p, x, y, w, s, mine) {
         var b = el('g', {}, p);
-        el('rect', { x: x, y: y, width: w, height: 34, rx: 12, fill: mine ? 'rgba(67,226,155,0.14)' : C.card2, stroke: mine ? C.acc : C.line }, b);
+        el('rect', { x: x, y: y, width: w, height: 34, rx: 12, fill: mine ? at(0.14) : C.card2, stroke: mine ? C.acc : C.line }, b);
         var t = txt('', { x: x + 12, y: y + 21.5, fill: mine ? C.ink : C.soft, 'font-size': 12 }, b);
         return { g: b, t: t, s: s };
       }
@@ -401,7 +415,7 @@
       this.ck = ['Summary', 'Recording'].map(function (s, i) {
         var r = el('g', {}, g);
         el('circle', { cx: 304, cy: 160 + i * 24, r: 8, fill: C.acc }, r);
-        el('path', { d: 'M300 ' + (160 + i * 24) + ' l3 3 l5 -6', fill: 'none', stroke: '#04140c', 'stroke-width': 2 }, r);
+        el('path', { d: 'M300 ' + (160 + i * 24) + ' l3 3 l5 -6', fill: 'none', stroke: C.accInk, 'stroke-width': 2 }, r);
         txt(s, { x: 318, y: 164 + i * 24, fill: C.ink, 'font-size': 12 }, r);
         return r;
       });
@@ -440,7 +454,7 @@
       var tw = el('g', {}, g);
       el('path', { d: 'M320 250 L334 120 L348 250 M324 210 L344 210 M327 175 L341 175', stroke: '#8f8f88', 'stroke-width': 3, fill: 'none' }, tw);
       this.waves = [0, 1, 2].map(function (i) { return el('path', { d: 'M' + (322 - i * 9) + ' ' + (110 - i * 7) + ' q12 ' + (-10 - i * 5) + ' 24 0', fill: 'none', stroke: C.acc, 'stroke-width': 2, 'stroke-linecap': 'round' }, tw); });
-      this.shield = el('path', { d: 'M-72 6 Q-72 -80 2 -86 Q76 -80 76 6', fill: 'rgba(67,226,155,0.06)', stroke: C.acc, 'stroke-width': 2.5 }, car);
+      this.shield = el('path', { d: 'M-72 6 Q-72 -80 2 -86 Q76 -80 76 6', fill: at(0.08), stroke: C.acc, 'stroke-width': 2.5 }, car);
       this.pk = []; for (var i = 0; i < 6; i++) this.pk.push(el('rect', { width: 9, height: 9, rx: 2, fill: C.acc }, g));
       this.at = []; for (var j = 0; j < 4; j++) this.at.push(el('rect', { width: 10, height: 10, rx: 2, fill: C.red }, g));
       this.read = txt('0.00%', { x: 20, y: 48, fill: C.acc, 'font-size': 36, 'font-weight': 700 }, g);
@@ -512,15 +526,15 @@
   // ---- GRANARY: the thermometer climbs, the alert fires, the system acts. --
   S.granary = {
     build: function (g) {
-      el('path', { d: 'M110 250 L110 96 Q110 50 165 44 Q220 50 220 96 L220 250 Z', fill: C.card, stroke: '#4a4e55', 'stroke-width': 2.5 }, g);
+      el('path', { d: 'M110 250 L110 96 Q110 50 165 44 Q220 50 220 96 L220 250 Z', fill: C.card, stroke: C.dim, 'stroke-width': 2.5 }, g);
       el('path', { d: 'M114 250 L114 150 Q165 138 216 150 L216 250 Z', fill: '#c9a24b', opacity: 0.8 }, g);
-      [120, 170, 220].forEach(function (y) { el('line', { x1: 110, y1: y, x2: 220, y2: y, stroke: '#3a3e45' }, g); });
+      [120, 170, 220].forEach(function (y) { el('line', { x1: 110, y1: y, x2: 220, y2: y, stroke: C.dim }, g); });
       this.alert = el('circle', { cx: 165, cy: 150, r: 110, fill: 'none', stroke: C.red, 'stroke-width': 3 }, g);
       this.fan = el('g', {}, g);
       for (var i = 0; i < 4; i++) el('ellipse', { cx: 0, cy: -9, rx: 5, ry: 10, fill: C.soft, transform: 'rotate(' + i * 90 + ')' }, this.fan);
       el('circle', { cx: 0, cy: 0, r: 4, fill: C.ink }, this.fan);
-      el('rect', { x: 262, y: 70, width: 18, height: 160, rx: 9, fill: C.card2, stroke: '#4a4e55', 'stroke-width': 2 }, g);
-      el('circle', { cx: 271, cy: 238, r: 16, fill: C.card2, stroke: '#4a4e55', 'stroke-width': 2 }, g);
+      el('rect', { x: 262, y: 70, width: 18, height: 160, rx: 9, fill: C.card2, stroke: C.dim, 'stroke-width': 2 }, g);
+      el('circle', { cx: 271, cy: 238, r: 16, fill: C.card2, stroke: C.dim, 'stroke-width': 2 }, g);
       this.merc = el('rect', { x: 266, y: 200, width: 10, height: 30, rx: 5, fill: C.acc }, g);
       this.bulb = el('circle', { cx: 271, cy: 238, r: 11, fill: C.acc }, g);
       el('line', { x1: 256, y1: 112, x2: 290, y2: 112, stroke: C.red, 'stroke-width': 1.5, 'stroke-dasharray': '3 3' }, g);
@@ -550,10 +564,10 @@
   // ---- POSTURE: slouch, buzz, sit up. ---------------------------------------
   S.posture = {
     build: function (g) {
-      el('rect', { x: 250, y: 150, width: 130, height: 8, rx: 4, fill: '#4a4e55' }, g);
-      el('rect', { x: 356, y: 158, width: 6, height: 100, fill: '#3a3e45' }, g);
-      el('rect', { x: 276, y: 118, width: 64, height: 32, rx: 4, fill: C.card2, stroke: '#4a4e55' }, g);
-      el('path', { d: 'M110 258 L110 212 L176 212', stroke: '#4a4e55', 'stroke-width': 6, fill: 'none', 'stroke-linecap': 'round' }, g);
+      el('rect', { x: 250, y: 150, width: 130, height: 8, rx: 4, fill: C.dim }, g);
+      el('rect', { x: 356, y: 158, width: 6, height: 100, fill: C.dim }, g);
+      el('rect', { x: 276, y: 118, width: 64, height: 32, rx: 4, fill: C.card2, stroke: C.dim }, g);
+      el('path', { d: 'M110 258 L110 212 L176 212', stroke: C.dim, 'stroke-width': 6, fill: 'none', 'stroke-linecap': 'round' }, g);
       this.legs = el('path', { d: 'M150 206 L214 206 L214 256', stroke: C.soft, 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
       this.spine = el('path', { stroke: C.ink, 'stroke-width': 10, fill: 'none', 'stroke-linecap': 'round' }, g);
       this.arm = el('path', { stroke: C.soft, 'stroke-width': 7, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
@@ -644,12 +658,12 @@
       this.a = paper('2025', 'Springer Nature');
       this.b = paper('2026', 'Pleiades · Springer');
       var st = this.stamp = el('g', {}, g);
-      el('rect', { x: -92, y: -26, width: 184, height: 52, rx: 8, fill: 'rgba(10,11,13,0.55)', stroke: C.acc, 'stroke-width': 3.5 }, st);
+      el('rect', { x: -92, y: -26, width: 184, height: 52, rx: 8, fill: C.bg, stroke: C.acc, 'stroke-width': 3.5 }, st);
       el('rect', { x: -84, y: -18, width: 168, height: 36, rx: 5, fill: 'none', stroke: C.acc, 'stroke-width': 1.5 }, st);
       txt('PEER REVIEWED', { x: 0, y: 7, 'text-anchor': 'middle', fill: C.acc, 'font-size': 20, 'font-weight': 800, 'letter-spacing': 2 }, st);
       this.x2 = el('g', {}, g);
       el('circle', { cx: 0, cy: 0, r: 22, fill: C.acc }, this.x2);
-      txt('×2', { x: 0, y: 7, 'text-anchor': 'middle', fill: '#04140c', 'font-size': 18, 'font-weight': 800 }, this.x2);
+      txt('×2', { x: 0, y: 7, 'text-anchor': 'middle', fill: C.accInk, 'font-size': 18, 'font-weight': 800 }, this.x2);
     },
     update: function (q) {
       var a = outc((q - 0.04) / 0.22), b = outc((q - 0.14) / 0.22);
@@ -684,11 +698,11 @@
         var k = win(q, 0.46 + i * 0.022, 0.5 + i * 0.022);
         tl.bg.setAttribute('fill', k > 0.5 ? C.acc : C.card);
         tl.bg.setAttribute('stroke', k > 0.5 ? C.acc : C.line);
-        tl.lab.setAttribute('fill', k > 0.5 ? '#04140c' : C.soft);
+        tl.lab.setAttribute('fill', k > 0.5 ? C.accInk : C.soft);
         tl.bg.setAttribute('transform', 'translate(0 ' + ((1 - k) * 6).toFixed(1) + ')');
       });
     }
   };
 
-  window.SCENES = { registry: S, el: el, NS: NS };
+  window.SCENES = { registry: S, el: el, NS: NS, setPalette: setPalette, mix: mix };
 })();

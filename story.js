@@ -27,6 +27,54 @@
   var win = function (q, a, b) { return smooth((q - a) / (b - a)); };
   var lerp = function (a, b, t) { return a + (b - a) * t; };
 
+  // ---- chapter colours --------------------------------------------------------
+  // g: ground, a: accent, ai: text that sits on the accent. Each project's
+  // pair comes from its own world (marigold for the election, lime for the
+  // healthy bowl, electric blue for the connected car). The ground stays deep
+  // so the warm ink always reads; the peak inverts to saffron.
+  var INK = '#f3efe6', INDIGO = '#0f1430', SAFFRON = '#ffb547';
+  var PAL = {
+    hero:  { g: INDIGO,    a: SAFFRON },
+    meet:  { g: '#120f2e', a: SAFFRON },
+    about: { g: '#10193a', a: SAFFRON },
+    lens:  { g: '#17143a', a: '#c9b0ff' },
+    w1:    { g: '#2a0f22', a: '#a6ec6a' },
+    w2:    { g: '#1b1036', a: '#5fe0e8' },
+    w3:    { g: '#0b2232', a: '#ffcf5a' },
+    w4:    { g: '#211238', a: '#82c8ff' },
+    w5:    { g: '#2e1216', a: '#ffb08a' },
+    w6:    { g: '#0e1d33', a: '#b9a6ff' },
+    w7:    { g: '#06192e', a: '#5ad1ff' },
+    w8:    { g: '#1b1a0b', a: '#cdee6e' },
+    w9:    { g: '#251707', a: '#ffd36b' },
+    w10:   { g: '#0d2427', a: '#ff9f7a' },
+    w11:   { g: '#16112f', a: '#ff95d2' },
+    pubs:  { g: '#221a12', a: SAFFRON },
+    peak:  { g: SAFFRON,   a: INDIGO, ink: INDIGO, ai: SAFFRON },
+    paper: { g: '#eef0f5', a: '#a54f00', ink: '#141a3a', ai: '#ffffff', soft: '#4d5375' },
+    close: { g: INDIGO,    a: SAFFRON }
+  };
+  function hx(h) { return [1, 3, 5].map(function (i) { return parseInt(h.substr(i, 2), 16); }); }
+  function toHex(c) { return '#' + c.map(function (v) { return ('0' + Math.round(v).toString(16)).slice(-2); }).join(''); }
+  function mixHex(a, b, t) { var A = hx(a), B = hx(b); return toHex(A.map(function (v, i) { return v + (B[i] - v) * t; })); }
+  Object.keys(PAL).forEach(function (k) {
+    var p = PAL[k];
+    p.ink = p.ink || INK; p.ai = p.ai || p.g;
+    p.soft = p.soft || mixHex(p.g, p.ink, 0.72);
+  });
+  var KEYS = ['g', 'a', 'ai', 'ink', 'soft'];
+  function blend(p, q, t) {
+    if (t <= 0) return p; if (t >= 1) return q;
+    var o = {}; KEYS.forEach(function (k) { o[k] = mixHex(p[k], q[k], t); }); return o;
+  }
+  var root = document.documentElement, themeMeta = document.querySelector('meta[name="theme-color"]'), applied = {};
+  function applyTheme(p) {
+    KEYS.forEach(function (k) {
+      if (applied[k] !== p[k]) { applied[k] = p[k]; root.style.setProperty('--' + k, p[k]); }
+    });
+    if (themeMeta && themeMeta.content !== p.g) themeMeta.content = p.g;
+  }
+
   // ---- the timeline ---------------------------------------------------------
   var SEGS = [], T = 0;
   stage.querySelectorAll('[data-part]').forEach(function (el) {
@@ -39,6 +87,19 @@
   });
   SEGS.forEach(function (s, i) { s.prev = SEGS[i - 1] || null; s.next = SEGS[i + 1] || null; });
   act.setAttribute('data-sc-span', (T + 1).toFixed(2));
+
+  function palAt(u) {
+    for (var i = 0; i < SEGS.length; i++) {
+      var s = SEGS[i], n = s.next;
+      if (!n) return PAL[s.id] || PAL.hero;
+      // the peak's inversion happens in the empty stretch before its copy arrives
+      var a = n.kind === 'peak' ? n.s + 0.02 * n.len : s.e - 0.08;
+      var b = n.kind === 'peak' ? n.s + 0.26 * n.len : s.e + 0.12;
+      if (u < a) return PAL[s.id] || PAL.hero;
+      if (u < b) return blend(PAL[s.id] || PAL.hero, PAL[n.id] || PAL.hero, smooth((u - a) / (b - a)));
+    }
+    return PAL.peak;
+  }
 
   function seg(id) { for (var i = 0; i < SEGS.length; i++) if (SEGS[i].id === id) return SEGS[i]; }
   function segAt(u) { for (var i = 0; i < SEGS.length; i++) if (u < SEGS[i].e) return SEGS[i]; return SEGS[SEGS.length - 1]; }
@@ -105,6 +166,7 @@
       s.wrap.innerHTML = '';
       var svg = el('svg', { viewBox: '0 0 400 300', preserveAspectRatio: 'xMidYMid meet', role: 'presentation' }, s.wrap);
       var g = el('g', {}, svg);
+      window.SCENES.setPalette(PAL[s.id]);
       s.sc.build(g, phone);
       if (s.sc.vb) svg.setAttribute('viewBox', s.sc.vb.join(' '));
       s.built = phone;
@@ -128,7 +190,7 @@
       var b;
       if (s.kind === 'peak') {
         var copy = rel(s.el.querySelector('.peak__copy'));
-        var top = copy.bottom + (phone ? 26 : 40), bw = Math.min(W - 2 * g, 980), bh = Math.max(80, H - top - (phone ? 24 : 48));
+        var top = copy.bottom + (phone ? 26 : 40), bw = Math.min(W - 2 * g, 980), bh = Math.max(80, H - top - (phone ? 84 : 104));
         var vb = s.sc.vb, asp = vb[2] / vb[3];
         if (bw / bh > asp) bw = bh * asp; else bh = bw / asp;
         b = { w: bw, h: bh, A: [phone ? (W - bw) / 2 : g, top], B: null };
@@ -152,7 +214,16 @@
   }
 
   // ---- scroll ---------------------------------------------------------------
-  var U = 0, Us = 0, t0 = performance.now();
+  var U = 0, Us = 0, t0 = performance.now(), lastGlow = '', snapNext = false;
+  var closeEl = document.getElementById('contact'), barH0 = 58;
+
+  // Which palette the page wears right now: the story's blend while the act is
+  // on screen, then paper, then the indigo bookend under the bar.
+  function theme() {
+    var r = act.getBoundingClientRect();
+    if (r.bottom > barH0) { applyTheme(palAt(Us)); return; }
+    applyTheme(closeEl && closeEl.getBoundingClientRect().top < barH0 ? PAL.close : PAL.paper);
+  }
   var heroLayers = [['.hero__who', 14], ['.hero__a', 30], ['.hero__b', 44], ['.hero__sub', 20], ['.hero__offer', 58]].map(function (x) {
     return { el: stage.querySelector(x[0]), r: x[1] };
   });
@@ -168,10 +239,11 @@
   function render(snap) {
     readU();
     // A smoothed playhead, so a notched wheel still reads as one glide.
+    if (snapNext) { snap = true; snapNext = false; }
     Us = snap || reduce ? U : Us + (U - Us) * 0.16;
     if (Math.abs(U - Us) < 0.0004) Us = U;
     var t = reduce ? 0 : (performance.now() - t0) / 1000;
-    var cur = segAt(Us), sig = cur.id;
+    var cur = segAt(Us), sig = cur.id, glow = null;
 
     SEGS.forEach(function (s) {
       if (!s.sc || !s.box) return;
@@ -193,7 +265,9 @@
       s.wrap.style.opacity = alpha.toFixed(3);
       s.wrap.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) scale(' + sc.toFixed(4) + ')';
       // Under reduced motion each scene shows its resolved state.
+      window.SCENES.setPalette(PAL[s.id]);
       s.sc.update(reduce ? 1 : qc, t);
+      if (s === cur) glow = (x + s.box.w / 2) / W * 100;
       if (s === cur) sig = s.id + ':' + qc.toFixed(2);
     });
 
@@ -212,6 +286,14 @@
       heroLayers.forEach(function (h) { h.el.style.transform = 'translate3d(0,' + (-hq * h.r * damp).toFixed(2) + 'px,0)'; });
       if (cur.kind === 'hero') sig = 'hero:' + hq.toFixed(2);
     }
+
+    // The chapter's colours, the glow behind its illustration, and the dock.
+    theme();
+    if (glow != null) {
+      var gx = glow.toFixed(1) + '%';
+      if (gx !== lastGlow) { lastGlow = gx; stage.style.setProperty('--glow-x', gx); }
+    }
+    dockUpdate(cur, Us);
 
     // Tell the verification harness what is actually painted.
     stage.setAttribute('data-sc-verify-state', sig);
@@ -235,8 +317,133 @@
     if (reduce) { render(true); return; }
     if (!running && visible()) { running = true; requestAnimationFrame(loop); }
   }
-  addEventListener('scroll', function () { if (!running) readU(); kick(); }, { passive: true });
+  addEventListener('scroll', function () { if (!running) { readU(); theme(); dockVis(); } kick(); }, { passive: true });
   document.addEventListener('visibilitychange', kick);
+
+  // ---- the dock: where you are, and a way to jump anywhere ------------------
+  // One tick per chapter. A recruiter who only wants project 7 should not have
+  // to scroll through six others to reach it.
+  var dock = document.getElementById('dock');
+  var dockN = dock.querySelector('.dock__n'), dockT = dock.querySelector('.dock__t');
+  var dockPrev = dock.querySelector('[data-step="-1"]'), dockNext = dock.querySelector('[data-step="1"]');
+  var CH = SEGS.filter(function (s) { return s.kind !== 'hero'; });
+  var PROJ = SEGS.filter(function (s) { return /^w\d+$/.test(s.id); });
+  var ticksEl = dock.querySelector('.dock__ticks');
+  CH.forEach(function (s) {
+    var li = document.createElement('li');
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'dock__tick';
+    b.setAttribute('aria-label', 'Go to ' + s.el.getAttribute('data-label'));
+    b.title = s.el.getAttribute('data-label');
+    b.innerHTML = '<span></span>';
+    var c = (PAL[s.id] || PAL.hero).a;
+    if (s.kind === 'peak') c = SAFFRON;
+    b.style.setProperty('--c', c);
+    b.addEventListener('click', function () { jumpTo(s); });
+    li.appendChild(b); ticksEl.appendChild(li);
+    s.tick = b.firstChild;
+  });
+  // Where a jump lands in each chapter: the moment its question is fully lit.
+  function landing(s) {
+    var q = { meet: 0.3, lens: 0.6, peak: 0.95 }[s.id];
+    return s.s + (q == null ? 0.2 : q) * s.len;
+  }
+  function yForU(u) {
+    var top = act.getBoundingClientRect().top + scrollY;
+    return top + (u / T) * (act.offsetHeight - innerHeight);
+  }
+  function jumpTo(s) {
+    snapNext = true;
+    scrollTo({ top: yForU(landing(s)), behavior: 'instant' });
+    kick();
+  }
+  function chapterIndex(u) {
+    var c = segAt(u);
+    return c.kind === 'hero' ? -1 : CH.indexOf(c);
+  }
+  dock.querySelectorAll('[data-step]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var i = chapterIndex(Us) + Number(b.getAttribute('data-step'));
+      if (i < 0) { scrollTo({ top: yForU(0), behavior: 'instant' }); snapNext = true; kick(); return; }
+      if (i < CH.length) jumpTo(CH[i]);
+    });
+  });
+  var dockOn = false, dockKey = '';
+  function dockVis() {
+    var r = act.getBoundingClientRect();
+    var on = U > SEGS[0].len * 0.7 && r.bottom > innerHeight * 0.6;
+    if (on !== dockOn) { dockOn = on; dock.classList.toggle('is-on', on); }
+  }
+  function dockUpdate(cur, u) {
+    dockVis();
+    var i = CH.indexOf(cur);
+    CH.forEach(function (s, k) {
+      var p = k < i ? 1 : k > i ? 0 : clamp((u - s.s) / s.len, 0, 1);
+      var v = p.toFixed(3);
+      if (s.tickP !== v) { s.tickP = v; s.tick.style.setProperty('--p', v); }
+    });
+    var key = cur.id;
+    if (key === dockKey) return;
+    dockKey = key;
+    var pi = PROJ.indexOf(cur);
+    dockN.textContent = pi >= 0 ? 'Project ' + (pi + 1) + ' of ' + PROJ.length : '';
+    dockT.textContent = cur.kind === 'hero' ? 'Start' : cur.el.getAttribute('data-label');
+    dockPrev.disabled = cur.kind === 'hero';
+    dockNext.disabled = i === CH.length - 1;
+  }
+  // Arrow keys step through chapters while the story is on screen.
+  addEventListener('keydown', function (e) {
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    var t = e.target;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    var cli = document.getElementById('cliOverlay');
+    if (cli && cli.classList.contains('open')) return;
+    var r = act.getBoundingClientRect();
+    if (r.bottom < innerHeight * 0.5 || r.top > 0) return;
+    e.preventDefault();
+    (e.key === 'ArrowRight' ? dockNext : dockPrev).click();
+  });
+
+  // ---- the hero's one moment: "friction" arrives mis-set and snaps into line
+  var heroPart = stage.querySelector('.hero');
+  (function () {
+    var fx = stage.querySelector('.fx');
+    if (!fx) return;
+    var word = fx.textContent, R = 7;
+    var rnd = function () { R = (R * 16807) % 2147483647; return (R - 1) / 2147483646; };
+    fx.textContent = '';
+    var sr = document.createElement('span'); sr.className = 'sr'; sr.textContent = word; fx.appendChild(sr);
+    var vis = document.createElement('span'); vis.setAttribute('aria-hidden', 'true'); fx.appendChild(vis);
+    word.split('').forEach(function (ch, i) {
+      var l = document.createElement('i'); l.textContent = ch;
+      if (!reduce) {
+        l.style.setProperty('--x', ((i ? rnd() - 0.5 : rnd() * 0.5) * 0.12).toFixed(3) + 'em');
+        l.style.setProperty('--y', ((rnd() - 0.5) * 0.22).toFixed(3) + 'em');
+        l.style.setProperty('--r', ((rnd() - 0.5) * 22).toFixed(1) + 'deg');
+        l.style.setProperty('--d', (i * 45) + 'ms');
+      }
+      vis.appendChild(l);
+    });
+    stage.querySelectorAll('.offer__cal li').forEach(function (li, i) { li.style.setProperty('--i', i); });
+    root.classList.add('js-hero');
+    var shipped = false;
+    function ship() { if (shipped) return; shipped = true; heroPart.classList.add('is-shipped'); }
+    if (reduce) { ship(); return; }
+    var go = function () { setTimeout(ship, 650); };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); else go();
+    addEventListener('scroll', ship, { once: true, passive: true });
+  })();
+
+  // ---- the record: each project row wears its chapter colour and can replay it
+  document.querySelectorAll('.gl__row').forEach(function (row) {
+    var s = seg(row.getAttribute('data-chapter'));
+    if (!s) return;
+    var a = PAL[s.id].a;
+    row.style.setProperty('--c', a);
+    var b = row.querySelector('[data-jump]');
+    if (b) b.addEventListener('click', function () { jumpTo(s); });
+  });
 
   var lastW = 0;
   function relayout() {
